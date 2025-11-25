@@ -93,7 +93,6 @@ import '../styles/global.css';
           const nameText = nameContainer.textContent || '';
           nameContainer.textContent = '';
 
-          // We use 'forEach' with an index (i) to calculate delay
           nameText.split('').forEach((letter, i) => {
               const span = document.createElement('span');
               
@@ -104,11 +103,33 @@ import '../styles/global.css';
               }
               
               span.classList.add('bouncy-letter');
+              span.style.animationDelay = `${i * 0.05}s`;
               
-              // THE MAGIC SAUCE: Add staggered delay based on index
-              // i * 0.05 means each letter is 50ms after the previous one
-              span.style.animationDelay = `${i * 0.025}s`;
+              // --- EVENT LISTENERS ---
+
+              // 1. Hover Trigger (Fire and Forget)
+              span.addEventListener('mouseenter', () => {
+                  // Only jump if we are already loaded (wave finished)
+                  if (span.classList.contains('loaded') && !span.classList.contains('active')) {
+                      span.classList.add('active');
+                  }
+              });
               
+              // 2. Animation End Handler (Handles both Wave and Jump)
+              span.addEventListener('animationend', (e) => {
+                  
+                  if (e.animationName === 'waveRise') {
+                      // The wave finished! Lock it in as visible.
+                      span.classList.add('loaded');
+                      // Reset delay so the jump doesn't have a delay
+                      span.style.animationDelay = '0s'; 
+                  } 
+                  else if (e.animationName === 'jump') {
+                      // The jump finished! Remove active class so we can jump again.
+                      span.classList.remove('active');
+                  }
+              });
+
               nameContainer.appendChild(span);
           });
       }
