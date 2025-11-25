@@ -1,0 +1,215 @@
+/* --- CSS Variables & Reset --- */
+:root {
+    /* The Cookie Palette */
+    --bg-cream: #FFF8F0;      /* Warm dough background */
+    --text-dark: #332D2D;     /* Soft chocolate text */
+    --accent-orange: #FF9248; /* Apricot/Marmalade accent */
+    --accent-blue: #5FBFF9;   /* A secondary playful blue */
+    
+    /* The Cookie Feel */
+    --cookie-radius: 30px;    /* Highly rounded corners */
+    --soft-shadow: 0 12px 30px rgba(255, 146, 72, 0.15); /* Warm, diffused shadow */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Rubik', sans-serif;
+    background-color: var(--bg-cream);
+    color: var(--text-dark);
+    overflow-x: hidden; /* Prevents horizontal scrollbar from tilt effect */
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* --- INTERACTION #3: Particles Background --- */
+#particles-js {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: -1; /* Puts it behind everything */
+    opacity: 0.6; /* Subtle */
+}
+
+/* --- Layout --- */
+.hero-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1200px;
+    width: 90%;
+    margin: auto;
+    padding: 4rem 2rem;
+    gap: 4rem;
+    z-index: 2;
+}
+
+.hero-content {
+    flex: 1;
+}
+
+/* --- Typography & Name Animation --- */
+.bouncy-name {
+    font-weight: 800;
+    font-size: 4rem;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+    color: var(--text-dark);
+    display: flex; /* Needed for the letters to bounce individually */
+    flex-wrap: wrap;
+}
+
+/* The class added by JS to individual letters */
+.bouncy-letter {
+    display: inline-block;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Bouncy spring physics */
+}
+
+.bouncy-letter:hover {
+    transform: translateY(-15px) scale(1.1); /* Bounce up and grow */
+    color: var(--accent-orange);
+}
+
+.subtitle {
+    font-weight: 600;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--accent-orange);
+}
+
+.intro-text {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    max-width: 500px;
+    margin-bottom: 2.5rem;
+    opacity: 0.8;
+}
+
+/* --- INTERACTION #2: Playful Skill Icons & Tooltips --- */
+.skills-bar {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.skill-icon-wrapper {
+    position: relative; /* For tooltip positioning */
+    width: 60px;
+    height: 60px;
+    background: white;
+    border-radius: 50%; /* Perfect circle cookie */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: var(--soft-shadow);
+    font-size: 1.8rem;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
+}
+
+.skill-icon-wrapper:hover {
+    transform: scale(1.15) rotate(5deg); /* Pop and slight tilt */
+    box-shadow: 0 15px 35px rgba(255, 146, 72, 0.25);
+}
+
+/* Individual Colors */
+.html { color: #E34F26; }
+.css { color: #1572B6; }
+.js { color: #F7DF1E; }
+.photo { color: var(--accent-orange); }
+
+/* The Cookie Tooltip */
+.skill-icon-wrapper::after {
+    content: attr(data-tooltip); /* Grabs the text from the HTML attribute */
+    position: absolute;
+    bottom: -40px;
+    left: 50%;
+    transform: translateX(-50%) scale(0); /* Hidden initially */
+    background-color: var(--text-dark);
+    color: var(--bg-cream);
+    padding: 0.5rem 1rem;
+    border-radius: 15px;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    opacity: 0;
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.skill-icon-wrapper:hover::after {
+    transform: translateX(-50%) scale(1); /* Pop up */
+    opacity: 1;
+    bottom: -50px;
+}
+
+/* --- CTA Button --- */
+.cta-button {
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    background-color: var(--accent-orange);
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    border-radius: var(--cookie-radius);
+    box-shadow: var(--soft-shadow);
+    transition: all 0.3s ease;
+}
+
+.cta-button:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(255, 146, 72, 0.3);
+    background-color: #ff8431;
+}
+
+/* --- INTERACTION #4: Tilt Image Container --- */
+.hero-image-container {
+    flex: 1;
+    max-width: 500px;
+    height: 600px;
+    border-radius: var(--cookie-radius);
+    overflow: hidden;
+    box-shadow: var(--soft-shadow);
+    /* Perspective is crucial for 3D tilt */
+    perspective: 1000px; 
+}
+
+.hero-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--cookie-radius);
+    transition: transform 0.1s ease-out; /* Smooth tilt movement */
+    /* A slight initial rotation adds character */
+    transform: rotateY(-5deg) rotateX(5deg); 
+}
+
+/* --- Mobile Responsiveness --- */
+@media (max-width: 900px) {
+    .hero-container {
+        flex-direction: column-reverse; /* Image on top for mobile */
+        text-align: center;
+        padding-top: 2rem;
+    }
+
+    .bouncy-name {
+        justify-content: center;
+        font-size: 3rem;
+    }
+
+    .skills-bar {
+        justify-content: center;
+    }
+
+    .hero-image-container {
+        height: 400px;
+        width: 100%;
+    }
+}

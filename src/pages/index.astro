@@ -1,5 +1,7 @@
 ---
-
+// src/pages/index.astro
+// This "frontmatter" section is for imports
+import '../styles/global.css'; // This applies your cookie-style CSS
 ---
 
 <html lang="en">
@@ -7,10 +9,27 @@
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
+		<title>Jason Wride | Studio</title>
+        
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;800&display=swap" rel="stylesheet">
+        
+        <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+        
+        <script is:inline src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 	</head>
 	<body>
-		<h1>Astro</h1>
+        <div id="particles-js"></div>
+
+        <main class="hero-container">
+            </main>
+
+        <script>
+            // Paste the CONTENTS of your script.js here.
+            // Do not include the <script> tags themselves, just the code inside.
+            
+            // NOTE: Ensure your image filename in the HTML matches what you put in /public
+        </script>
 	</body>
 </html>
