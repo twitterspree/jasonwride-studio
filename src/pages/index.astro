@@ -25,8 +25,8 @@ import '../styles/global.css';
         <div class="hero-content">
             <h1 class="bouncy-name">Hi, I'm Jason Wride.</h1>
             
-            <h2 class="subtitle">IS Student. Photographer. Creator. at University of Utah.</h2>
-            <p class="intro-text">Welcome to my studio. This is where code meets creativity or whatever it is I waste my time on. Take a look around my playground.</p>
+            <h2 class="subtitle">IS Student. 'Photographer'. "Creator". at University of Utah.</h2>
+            <p class="intro-text">Welcome to my studio. This is where 'code meets creativity' or whatever it is I waste my time on. Take a look around or hmu.</p>
 
             <div class="skills-bar">
                 <div class="skill-icon-wrapper" data-tooltip="HTML5 Structure">
@@ -95,39 +95,51 @@ import '../styles/global.css';
 
           nameText.split('').forEach((letter, i) => {
               const span = document.createElement('span');
-              
               if (letter === ' ') {
                   span.innerHTML = '&nbsp;';
               } else {
                   span.textContent = letter;
               }
-              
               span.classList.add('bouncy-letter');
               span.style.animationDelay = `${i * 0.05}s`;
               
-              // --- EVENT LISTENERS ---
+              // --- STATE MANAGEMENT ---
+              // Track if the letter is currently in the middle of jumping up
+              let isRising = false;
 
-              // 1. Hover Trigger (Fire and Forget)
+              // 1. Mouse Enter: Trigger the jump
               span.addEventListener('mouseenter', () => {
-                  // Only jump if we are already loaded (wave finished)
-                  if (span.classList.contains('loaded') && !span.classList.contains('active')) {
-                      span.classList.add('active');
+                  // Only interact if the entrance wave is finished
+                  if (span.classList.contains('loaded')) {
+                      span.classList.add('up');
+                      isRising = true;
+
+                      // Enforce Minimum Rise Time (200ms matches CSS transition)
+                      setTimeout(() => {
+                          isRising = false;
+                          // If the mouse left while we were rising, we come down NOW.
+                          if (!span.matches(':hover')) {
+                              span.classList.remove('up');
+                          }
+                      }, 200); 
+                  }
+              });
+
+              // 2. Mouse Leave: Trigger the fall (maybe)
+              span.addEventListener('mouseleave', () => {
+                  // If we are currently rising, DO NOTHING. 
+                  // The setTimeout above will handle the drop when it finishes.
+                  
+                  // If we are NOT rising (meaning we are holding at the top), drop immediately.
+                  if (!isRising) {
+                      span.classList.remove('up');
                   }
               });
               
-              // 2. Animation End Handler (Handles both Wave and Jump)
-              span.addEventListener('animationend', (e) => {
-                  
-                  if (e.animationName === 'waveRise') {
-                      // The wave finished! Lock it in as visible.
-                      span.classList.add('loaded');
-                      // Reset delay so the jump doesn't have a delay
-                      span.style.animationDelay = '0s'; 
-                  } 
-                  else if (e.animationName === 'jump') {
-                      // The jump finished! Remove active class so we can jump again.
-                      span.classList.remove('active');
-                  }
+              // 3. Animation End: Mark as loaded (Existing logic)
+              span.addEventListener('animationend', () => {
+                  span.classList.add('loaded');
+                  span.style.animationDelay = '0s';
               });
 
               nameContainer.appendChild(span);

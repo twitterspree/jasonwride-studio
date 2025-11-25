@@ -4,12 +4,6 @@
     100% { opacity: 1; top: 0; }
 }
 
-@keyframes jump {
-    0% { transform: scale(1) translateY(0); }
-    30% { transform: scale(1.1) translateY(-15px); color: var(--accent-orange); }
-    100% { transform: scale(1) translateY(0); color: var(--text-dark); }
-}
-
 /* --- CSS Variables & Reset --- */
 :root {
     /* The Cookie Palette */
@@ -80,28 +74,35 @@ body {
 }
 
 /* The class added by JS to individual letters */
-/* --- 2-PHASE ANIMATION SYSTEM --- */
+/* --- HYBRID ANIMATION SYSTEM --- */
 
-/* 1. Base State (Hidden Start) */
+/* 1. Base State (Hidden, waiting for wave) */
 .bouncy-letter {
     display: inline-block;
     position: relative;
-    opacity: 0; /* Start hidden */
-    /* Only the entrance wave is defined here */
+    opacity: 0; /* Hidden initially */
+    top: 20px;  /* Pushed down initially */
+    
+    /* The Entrance Wave Animation */
     animation: waveRise 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
-/* 2. Loaded State (The Safety Lock) */
+/* 2. Loaded State (The Interactive Phase) */
 .bouncy-letter.loaded {
-    opacity: 1 !important; /* Force visibility */
-    top: 0 !important;     /* Force position */
-    animation: none;       /* Stop the entrance animation so it doesn't replay */
+    opacity: 1 !important;
+    top: 0 !important;
+    animation: none;
+    
+    /* Transition applies to transform (movement) and color */
+    /* Note: We set this to 0.3s. JS must match this timing! */
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.3s ease;
 }
 
-/* 3. Active State (The Jump) */
-.bouncy-letter.active {
-    /* Run the jump animation */
-    animation: jump 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+/* 3. "Up" State (Applied by JS) */
+/* Replaces the old :hover rule so JS can control the timing */
+.bouncy-letter.up {
+    transform: translateY(-15px) scale(1.1); 
+    color: var(--accent-orange);
 }
 
 .subtitle {
