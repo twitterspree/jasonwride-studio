@@ -1,3 +1,19 @@
+/* animations :) */
+/* --- UPDATED ANIMATION (Conflict-Free) --- */
+
+/* 1. Use 'top' instead of 'transform' for the rising effect */
+@keyframes waveRise {
+    0% {
+        opacity: 0;
+        top: 20px; /* Start pushed down */
+    }
+    100% {
+        opacity: 1;
+        top: 0;    /* Settle in natural place */
+    }
+}
+
+
 /* --- CSS Variables & Reset --- */
 :root {
     /* The Cookie Palette */
@@ -70,11 +86,19 @@ body {
 /* The class added by JS to individual letters */
 .bouncy-letter {
     display: inline-block;
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Bouncy spring physics */
+    position: relative; /* REQUIRED: allows 'top' to work */
+    opacity: 0;         /* Start hidden */
+    
+    /* Animation settings */
+    animation: waveRise 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    
+    /* Transition for the Hover effect */
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.1s ease;
 }
 
+/* 2. Hover is now free to use 'transform' without fighting */
 .bouncy-letter:hover {
-    transform: translateY(-15px) scale(1.1); /* Bounce up and grow */
+    transform: translateY(-15px) scale(1.1);
     color: var(--accent-orange);
 }
 
