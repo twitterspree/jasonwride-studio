@@ -112,11 +112,20 @@ const myPhotos = [
           }
         },
         "interactivity": {
-          "detect_on": "canvas",
+          "detect_on": "window",
           "events": {
             "onhover": { "enable": true, "mode": "bubble" },
             "onclick": { "enable": false },
             "resize": true
+          },
+          "modes": {
+            "bubble": {
+              "distance": 100,  // How close the mouse must be to trigger effect
+              "size": 15,       // <--- TARGET SIZE: How big they grow (Default is roughly 4)
+              "duration": 0.1,    // How long the animation lasts
+              "opacity": 0.8,   // Target opacity (optional, makes them brighter)
+              "speed": 0.1       // Growth speed
+            }
           }
         },
         "retina_detect": true
