@@ -30,6 +30,17 @@ const myPhotos = [
     <script is:inline src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
   </head>
   <body>
+
+	<nav class="navbar">
+    	<div class="logo">jasonwride<span class="dot">.studio</span></div>
+    	<div class="nav-links">
+        	<a href="https://github.com/twitterspree" target="_blank" class="nav-item">GitHub</a>
+       		<a href="https://linkedin.com/in/your-profile" target="_blank" class="nav-item">LinkedIn</a>
+        	<a href="mailto:jason.wride@utah.edu" class="nav-item contact-pill">Hi! 👋</a>
+    	</div>
+	</nav>
+
+
     <div id="particles-js"></div>
 
     <main class="hero-container">
@@ -54,7 +65,7 @@ const myPhotos = [
                 </div>
             </div>
 
-            <a href="#contact" class="cta-button">Get in Touch</a>
+            <a href="mailto:jason.wride@utah.edu" class="cta-button">Get in Touch</a>
         </div>
 
         <div class="hero-image-container tilt-effect">
@@ -75,13 +86,13 @@ const myPhotos = [
       particlesJS("particles-js", {
         "particles": {
           "number": {
-            "value": 100,
+            "value": 120,
             "density": { "enable": true, "value_area": 800 }
           },
           "color": { "value": "#FF9248" },
           "shape": { "type": "circle" },
-          "opacity": { "value": 0.4, "random": true },
-          "size": { "value": 5, "random": true },
+          "opacity": { "value": 0.5, "random": true },
+          "size": { "value": 6, "random": true },
           "line_linked": { "enable": false },
           "move": {
             "enable": true,

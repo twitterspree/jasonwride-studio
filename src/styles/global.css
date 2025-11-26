@@ -44,9 +44,7 @@ body {
     color: var(--text-dark);
     overflow-x: hidden; /* Prevents horizontal scrollbar from tilt effect */
     min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    display: block;
 }
 
 /* --- INTERACTION #3: Particles Background --- */
@@ -232,6 +230,79 @@ body {
     /* A slight initial rotation adds character */
     transform: rotateY(-5deg) rotateX(5deg); 
 }
+
+/* --- NAVIGATION BAR --- */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    width: 90%;
+    margin: 2rem auto 0 auto; /* Top margin pushes it down slightly */
+    padding: 1rem 2rem;
+    
+    /* The "Floating Cookie" Look */
+    background: rgba(255, 255, 255, 0.6); /* Semi-transparent */
+    backdrop-filter: blur(10px); /* The "Frosted Glass" effect */
+    border-radius: 50px; /* Super rounded pill shape */
+    box-shadow: 0 4px 20px rgba(255, 146, 72, 0.05); /* Very subtle glow */
+    
+    /* Keep it on top of particles */
+    position: relative;
+    z-index: 100;
+}
+
+.logo {
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: var(--text-dark);
+    letter-spacing: -0.5px;
+}
+
+.dot {
+    color: var(--accent-orange);
+}
+
+.nav-links {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.nav-item {
+    text-decoration: none;
+    color: var(--text-dark);
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: color 0.2s ease;
+}
+
+.nav-item:hover {
+    color: var(--accent-orange);
+}
+
+/* The "Say Hi" Pill Button in the Nav */
+.contact-pill {
+    background-color: var(--accent-orange);
+    color: white !important; /* Force white text */
+    padding: 0.5rem 1.2rem;
+    border-radius: 30px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.contact-pill:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 146, 72, 0.4);
+}
+
+/* Mobile Tweak: Hide text links, keep 'Hi' button */
+@media (max-width: 600px) {
+    .nav-item:not(.contact-pill) {
+        display: none;
+    }
+}
+
+
 
 /* --- Mobile Responsiveness --- */
 @media (max-width: 900px) {
