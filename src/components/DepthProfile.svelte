@@ -45,7 +45,7 @@
 
                 // 2. Calculate Offset (Movement)
                 // Keep sensitivity low (0.01) to prevent tearing
-                vec2 offset = u_mouse * depth * 0.015; 
+                vec2 offset = u_mouse * depth * 0.02; 
 
                 // 3. Fetch the "Moved" Color (The 3D Face)
                 vec4 distortedColor = texture2D(u_image, vUv + offset);
