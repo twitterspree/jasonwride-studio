@@ -1,6 +1,17 @@
 ---
 // 1. FRONTMATTER: This is where we import styles
 import '../styles/global.css';
+
+import Gallery from '../components/Gallery.svelte';
+
+// Let's create some dummy data for now
+const myPhotos = [
+    { url: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', alt: 'Camera' },
+    { url: 'https://images.unsplash.com/photo-1500485035595-cbe6f645feb1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', alt: 'Canyon' },
+    { url: 'https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', alt: 'Leaves' },
+    { url: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', alt: 'Fog' },
+    { url: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', alt: 'Grass' },
+];
 ---
 
 <html lang="en">
@@ -50,6 +61,13 @@ import '../styles/global.css';
             <img src="/profilepictiny.png" alt="Jason Wride Portrait" class="hero-img">
         </div>
     </main>
+
+
+	<section class="gallery-section">
+	    <h2 class="section-title">Selected Shots</h2>
+
+	    <Gallery client:load images={myPhotos} />
+	</section>
 
     <script>
       // --- INTERACTION #3: Particle Background Configuration ---
