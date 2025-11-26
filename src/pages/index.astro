@@ -4,6 +4,8 @@ import '../styles/global.css';
 
 import Gallery from '../components/Gallery.svelte';
 
+import DepthProfile from '../components/DepthProfile.svelte';
+
 // Let's create some dummy data for now
 const myPhotos = [
     { url: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', alt: 'Camera' },
@@ -69,7 +71,12 @@ const myPhotos = [
         </div>
 
         <div class="hero-image-container tilt-effect">
-            <img src="/profilepictiny.png" alt="Jason Wride Portrait" class="hero-img">
+			<DepthProfile 
+				client:load 
+				src="/profilepictiny.png" 
+				depthSrc="/profile-depthv2.png" 
+				alt="Jason Wride Portrait"
+			/>
         </div>
     </main>
 
@@ -93,7 +100,7 @@ const myPhotos = [
           "shape": { "type": "circle" },
           "opacity": { "value": 0.5, "random": true },
           "size": { "value": 6, "random": true },
-          "line_linked": { "enable": false },
+          "line_linked": { "enable": false}, // for cool lines -> true, "distance": 150, "color": "#FF9248", "opacity": 0.4, "width": 1 },
           "move": {
             "enable": true,
             "speed": 1,
