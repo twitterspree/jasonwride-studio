@@ -2,7 +2,8 @@
 // 1. FRONTMATTER: This is where we import styles
 import '../styles/global.css';
 
-import Gallery from '../components/Gallery.svelte';
+// import Gallery from '../components/Gallery.svelte';
+import MarqueeGallery from '../components/MarqueeGallery.svelte'; // Add this
 
 import DepthProfile from '../components/DepthProfile.svelte';
 
@@ -37,8 +38,6 @@ const myPhotos = [
     <meta property="og:description" content="IS Student. Photographer. Creator. Check out my interactive portfolio." />
     <meta property="og:image" content="https://jasonwride.studio/profilepictiny.png" /> <meta property="og:url" content="https://jasonwride.studio" />
     <meta property="og:type" content="website" />
-
-
 
   </head>
   <body>
@@ -91,11 +90,11 @@ const myPhotos = [
     </main>
 
 
-	<section class="gallery-section">
-	    <h2 class="section-title">Selected Shots</h2>
+	<section id="shots" class="gallery-section">
+        <h2 class="section-title">Photo roulette...</h2>
 
-	    <Gallery client:load images={myPhotos} />
-	</section>
+        <MarqueeGallery client:load images={myPhotos} />
+    </section>
 
     <script>
       // --- INTERACTION #3: Particle Background Configuration ---
