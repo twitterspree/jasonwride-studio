@@ -329,7 +329,6 @@ footer {
 }
 
 
-
 /* --- Mobile Responsiveness --- */
 @media (max-width: 900px) {
     .hero-container {
@@ -351,4 +350,109 @@ footer {
         height: 400px;
         width: 100%;
     }
+}
+
+
+/* --- PROJECTS SECTION --- */
+.projects-section {
+    max-width: 1000px;
+    margin: 4rem auto 6rem auto;
+    padding: 0 2rem;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 3rem;
+    color: var(--text-dark);
+}
+
+.project-grid {
+    display: grid;
+    /* Auto-fit: Creates as many columns as fit, min 340px wide */
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 2rem;
+}
+
+.project-card {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 30px; /* Matching your 'cookie' radius */
+    box-shadow: 0 10px 30px rgba(255, 146, 72, 0.05); /* Subtle orange glow */
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.03);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Makes cards same height */
+}
+
+.project-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(255, 146, 72, 0.15);
+}
+
+/* Typography */
+.project-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    color: var(--text-dark);
+}
+
+.project-desc {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #666; /* Softer text */
+    margin-bottom: 1.5rem;
+    flex-grow: 1; /* Pushes the tech stack to the bottom */
+}
+
+/* Tech Pills */
+.tech-stack {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: auto; /* Force to bottom */
+}
+
+.tech-tag {
+    background: var(--bg-cream);
+    color: var(--text-dark);
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+/* Status Badges */
+.status-pill {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+}
+
+.status-private { background: #F3F3F3; color: #888; }
+.status-public { background: #E6F7FF; color: #0077CC; }
+
+/* Links */
+.project-link {
+    display: inline-block;
+    margin-top: 1.5rem;
+    font-weight: 700;
+    color: var(--accent-orange);
+    text-decoration: none;
+    font-size: 0.95rem;
+}
+
+.project-link:hover {
+    text-decoration: underline;
 }

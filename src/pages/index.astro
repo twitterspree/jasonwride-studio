@@ -96,6 +96,47 @@ const myPhotos = [
         <MarqueeGallery client:load images={myPhotos} />
     </section>
 
+    <section id="projects" class="projects-section">
+        <h2 class="section-title">Technical Projects</h2>
+        
+        <div class="project-grid">
+            
+            <div class="project-card">
+                <span class="status-pill status-private">Private Repo</span>
+                <h3 class="project-title">Local RAG AI Assistant</h3>
+                <p class="project-desc">
+                    A native macOS/iOS app that leverages local LLMs (via Ollama) to perform Retrieval-Augmented Generation (RAG) on iMessage history. <br><br>
+                    Engineered to allow semantic search and "chat with your texts" functionality while maintaining 100% data privacy and offline capability.
+                </p>
+                <div class="tech-stack">
+                    <span class="tech-tag">SwiftUI</span>
+                    <span class="tech-tag">Ollama</span>
+                    <span class="tech-tag">Vector DB</span>
+                    <span class="tech-tag">Local LLM</span>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <span class="status-pill status-public">Public Repo</span>
+                <h3 class="project-title">JasonWride.Studio</h3>
+                <p class="project-desc">
+                    A high-performance portfolio site featuring 3D WebGL depth mapping, Svelte-powered reactive components, and serverless architecture. <br><br>
+                    Optimized for 100/100 Lighthouse performance scores and deployed via Vercel Edge Network.
+                </p>
+                <div class="tech-stack">
+                    <span class="tech-tag">Astro</span>
+                    <span class="tech-tag">Svelte</span>
+                    <span class="tech-tag">WebGL</span>
+                    <span class="tech-tag">TypeScript</span>
+                </div>
+                <a href="https://github.com/twitterspree/jasonwride.studio" target="_blank" class="project-link">View Source Code &rarr;</a>
+            </div>
+
+            </div>
+    </section>
+
+
+
     <script>
       // --- INTERACTION #3: Particle Background Configuration ---
       // @ts-ignore
