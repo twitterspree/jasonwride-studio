@@ -116,8 +116,9 @@
         box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
     }
 
-    .paused {
-        animation-play-state: paused;
+    /* Specificity fix: .marquee-track.paused (0-2-0) overrides .marquee-track.loaded (0-2-0) because it's lower in the file */
+    .marquee-track.paused {
+        animation-play-state: paused !important;
     }
 </style>
 
