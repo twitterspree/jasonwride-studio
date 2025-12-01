@@ -142,7 +142,7 @@ const myPhotos = [
       // --- INTERACTION #3: Particle Background Configuration ---
       // @ts-ignore
       <script>
-      // @ts-ignore
+      // @ts-expect-error okay to ignore tsParticles global
       // tsParticles uses ".load" instead of just passing the ID
       tsParticles.load("particles-js", {
         "particles": {
