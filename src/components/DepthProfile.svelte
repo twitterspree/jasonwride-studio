@@ -12,6 +12,9 @@
         const gl = canvas.getContext('webgl');
         if (!gl) return;
 
+        // Fix for white halo: Pre-multiply alpha so WebGL handles transparency correctly
+        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+
         // --- 1. Vertex Shader (Updated for Aspect Ratio Fix) ---
         const vertShaderSource = `
             attribute vec2 position;
@@ -50,15 +53,11 @@
                 // 3. Fetch the "Moved" Color (The 3D Face)
                 vec4 distortedColor = texture2D(u_image, vUv + offset);
 
-                // 4. Fetch the "Static" Alpha (The Original Cutout)
-                // We sample the original image WITHOUT offset to get the hard edge
-                vec4 originalColor = texture2D(u_image, vUv);
-
-                // 5. Combine them
-                // We use the moved color, but we force the alpha to match the original silhouette.
+                // 4. Combine them
+                // We use the distorted alpha so the mask moves WITH the pixels.
+                // This prevents pulling in "transparent black" pixels from the background.
                 gl_FragColor = distortedColor;
-                gl_FragColor.a = originalColor.a;
-
+                
                 // Optional: Discard fully transparent pixels to keep GPU happy
                 if (gl_FragColor.a < 0.01) discard;
             }
