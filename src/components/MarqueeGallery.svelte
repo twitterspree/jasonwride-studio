@@ -1,6 +1,9 @@
 <script>
+    import { onMount } from 'svelte';
+    
     export let images = [];
     let selectedImage = null;
+    let imagesLoaded = false;
 
     function openLightbox(img) {
         selectedImage = img;
@@ -14,6 +17,25 @@
     function handleKeydown(e) {
         if (e.key === 'Escape') closeLightbox();
     }
+
+    // Preload all images before starting animation
+    onMount(() => {
+        const imagePromises = images.map(img => {
+            return new Promise((resolve, reject) => {
+                const imageEl = new Image();
+                imageEl.onload = resolve;
+                imageEl.onerror = reject;
+                imageEl.src = img.url;
+            });
+        });
+
+        Promise.all(imagePromises).then(() => {
+            imagesLoaded = true;
+        }).catch(err => {
+            console.error('Some images failed to load', err);
+            imagesLoaded = true; // Start anyway after error
+        });
+    });
 </script>
 
 <style>
@@ -32,6 +54,11 @@
         display: inline-flex;
         gap: 1.5rem;
         animation: scroll 40s linear infinite;
+        animation-play-state: paused; /* Start paused */
+    }
+
+    .marquee-track.loaded {
+        animation-play-state: running; /* Start animation when ready */
     }
 
     /* .marquee-track:hover {
@@ -97,17 +124,17 @@
 <svelte:window on:keydown={handleKeydown} />
 
 <div class="marquee-container">
-    <div class="marquee-track {selectedImage ? 'paused' : ''}">
+    <div class="marquee-track {selectedImage ? 'paused' : ''} {imagesLoaded ? 'loaded' : ''}">
         
         {#each images as img}
             <button class="img-btn" on:click={() => openLightbox(img)} aria-label={img.alt}>
-                <img src={img.url} alt={img.alt} class="marquee-item" />
+                <img src={img.url} alt={img.alt} class="marquee-item" loading="eager" />
             </button>
         {/each}
 
         {#each images as img}
             <button class="img-btn" on:click={() => openLightbox(img)} aria-label={img.alt}>
-                <img src={img.url} alt={img.alt} class="marquee-item" />
+                <img src={img.url} alt={img.alt} class="marquee-item" loading="eager" />
             </button>
         {/each}
     </div>
