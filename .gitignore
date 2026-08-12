@@ -44,8 +44,7 @@ bun-debug.log*
 repomix-output.xml
 
 # lockfile of the package manager you're NOT using — uncomment whichever applies
-# package-lock.json
-# bun.lock
+package-lock.json
 
 # misc caches
 .cache/
