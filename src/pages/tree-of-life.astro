@@ -1,0 +1,40 @@
+---
+import '../styles/global.css';
+import ConstellationTree from '../components/ConstellationTree.svelte';
+import treeData from '../data/tree.json';
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tree of Life (3D) | Jason Wride</title>
+    <meta name="description" content="An interactive 3D visualization of convergent evolution, built with Three.js and WebGL by Jason Wride." />
+    <meta property="og:title" content="Tree of Life (3D) | Jason Wride" />
+    <meta property="og:description" content="An interactive 3D visualization of convergent evolution, built with Three.js and WebGL." />
+    <meta property="og:image" content="https://jasonwride.studio/profilepictiny.avif" />
+    <meta property="og:url" content="https://jasonwride.studio/tree-of-life" />
+    <meta property="og:type" content="website" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;800&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <!-- Navigation bar -->
+    <nav class="navbar" style="margin-bottom: 2rem;">
+        <div class="logo">jasonwride<span class="dot">.studio</span></div>
+        <div class="nav-links">
+            <a href="/" class="nav-item contact-pill">&larr; Back Home</a>
+        </div>
+    </nav>
+
+    <main style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+        <h1 class="section-title" style="margin-bottom: 0.5rem;">Convergent Evolution (3D Constellation)</h1>
+        <p class="intro-text" style="text-align: center; margin: 0 auto 2rem; max-width: 700px;">
+            A 3D spatial constellation mapping phylogenetic relationships using Three.js and WebGL. Drag to rotate in 360 degrees, scroll to zoom.
+        </p>
+
+        <!-- Mount the 3D WebGL component -->
+        <ConstellationTree client:load treeData={treeData} />
+    </main>
+  </body>
+</html>

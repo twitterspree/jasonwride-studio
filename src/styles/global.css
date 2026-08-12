@@ -1,0 +1,458 @@
+/* animations :) */
+@keyframes waveRise {
+    0% { opacity: 0; top: 20px; }
+    100% { opacity: 1; top: 0; }
+}
+
+/* --- CSS Variables & Reset --- */
+:root {
+    /* The Cookie Palette */
+    --bg-cream: #FFF8F0;      /* Warm dough background */
+    --text-dark: #332D2D;     /* Soft chocolate text */
+    --accent-orange: #FF9248; /* Apricot/Marmalade accent */
+    --accent-blue: #5FBFF9;   /* A secondary playful blue */
+    
+    /* The Cookie Feel */
+    --cookie-radius: 30px;    /* Highly rounded corners */
+    --soft-shadow: 0 12px 30px rgba(255, 146, 72, 0.15); /* Warm, diffused shadow */
+}
+
+
+.gallery-section {
+    /* Allow it to be wider for the marquee effect */
+    max-width: 100%; 
+    padding: 0; /* Remove padding so it touches edges if you want */
+    margin-bottom: 4rem;
+}
+
+.section-title {
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 2rem;
+    color: var(--accent-orange);
+}
+
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Rubik', sans-serif;
+    background-color: var(--bg-cream);
+    color: var(--text-dark);
+    overflow-x: hidden; /* Prevents horizontal scrollbar from tilt effect */
+    min-height: 100vh;
+    display: block;
+}
+
+/* --- INTERACTION #3: Particles Background --- */
+#particles-js {
+    /* OLD: position: absolute; */
+    
+    /* NEW: Fixed keeps it stuck to the screen while you scroll */
+    position: fixed; 
+    
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: -1; 
+    opacity: 0.6; 
+}
+
+/* --- Layout --- */
+.hero-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1200px;
+    width: 90%;
+    margin: auto;
+    padding: 4rem 2rem;
+    gap: 4rem;
+    z-index: 2;
+}
+
+.hero-content {
+    flex: 1;
+}
+
+/* --- Typography & Name Animation --- */
+.bouncy-name {
+    font-weight: 800;
+    font-size: 3.5rem;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+    color: var(--text-dark);
+    display: flex; /* Needed for the letters to bounce individually */
+    flex-wrap: wrap;
+}
+
+/* The class added by JS to individual letters */
+/* --- HYBRID ANIMATION SYSTEM --- */
+
+/* 1. Base State (Hidden, waiting for wave) */
+.bouncy-letter {
+    display: inline-block;
+    position: relative;
+    opacity: 0; /* Hidden initially */
+    top: 20px;  /* Pushed down initially */
+    
+    /* The Entrance Wave Animation */
+    animation: waveRise 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* 2. Loaded State (The Interactive Phase) */
+.bouncy-letter.loaded {
+    opacity: 1 !important;
+    top: 0 !important;
+    animation: none;
+    
+    /* Transition applies to transform (movement) and color */
+    /* Note: We set this to 0.3s. JS must match this timing! */
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.3s ease;
+}
+
+/* 3. "Up" State (Applied by JS) */
+/* Replaces the old :hover rule so JS can control the timing */
+.bouncy-letter.up {
+    transform: translateY(-15px) scale(1.1); 
+    color: var(--accent-orange);
+}
+
+.subtitle {
+    font-weight: 600;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--accent-orange);
+}
+
+.intro-text {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    max-width: 500px;
+    margin-bottom: 2.5rem;
+    opacity: 0.8;
+}
+
+/* --- INTERACTION #2: Playful Skill Icons & Tooltips --- */
+.skills-bar {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.skill-icon-wrapper {
+    position: relative; /* For tooltip positioning */
+    width: 60px;
+    height: 60px;
+    background: white;
+    border-radius: 50%; /* Perfect circle cookie */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: var(--soft-shadow);
+    font-size: 1.8rem;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
+}
+
+.skill-icon-wrapper:hover {
+    transform: scale(1.15) rotate(5deg); /* Pop and slight tilt */
+    box-shadow: 0 15px 35px rgba(255, 146, 72, 0.25);
+}
+
+/* Individual Colors */
+.html { color: #E34F26; }
+.css { color: #1572B6; }
+.js { color: #F7DF1E; }
+.photo { color: var(--accent-orange); }
+
+/* The Cookie Tooltip */
+.skill-icon-wrapper::after {
+    content: attr(data-tooltip); /* Grabs the text from the HTML attribute */
+    position: absolute;
+    bottom: -40px;
+    left: 50%;
+    transform: translateX(-50%) scale(0); /* Hidden initially */
+    background-color: var(--text-dark);
+    color: var(--bg-cream);
+    padding: 0.5rem 1rem;
+    border-radius: 15px;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    opacity: 0;
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.skill-icon-wrapper:hover::after {
+    transform: translateX(-50%) scale(1); /* Pop up */
+    opacity: 1;
+    bottom: -50px;
+}
+
+/* --- CTA Button --- */
+.cta-button {
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    background-color: var(--accent-orange);
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    border-radius: var(--cookie-radius);
+    box-shadow: var(--soft-shadow);
+    transition: all 0.3s ease;
+}
+
+.cta-button:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(255, 146, 72, 0.3);
+    background-color: #ff8431;
+}
+
+/* --- INTERACTION #4: Tilt Image Container --- */
+.hero-image-container {
+    flex: 1;
+    max-width: 500px;
+    height: 600px;
+    border-radius: var(--cookie-radius);
+    overflow: hidden;
+    box-shadow: var(--soft-shadow);
+    /* Perspective is crucial for 3D tilt */
+    perspective: 1000px; 
+}
+
+.hero-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--cookie-radius);
+    transition: transform 0.1s ease-out; /* Smooth tilt movement */
+    /* A slight initial rotation adds character */
+    transform: rotateY(-5deg) rotateX(5deg); 
+}
+
+/* --- NAVIGATION BAR --- */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    width: 90%;
+    margin: 2rem auto 0 auto; /* Top margin pushes it down slightly */
+    padding: 1rem 2rem;
+    
+    /* The "Floating Cookie" Look */
+    background: rgba(255, 255, 255, 0.6); /* Semi-transparent */
+    backdrop-filter: blur(10px); /* The "Frosted Glass" effect */
+    border-radius: 50px; /* Super rounded pill shape */
+    box-shadow: 0 4px 20px rgba(255, 146, 72, 0.05); /* Very subtle glow */
+    
+    /* Keep it on top of particles */
+    position: relative;
+    z-index: 100;
+}
+
+.logo {
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: var(--text-dark);
+    letter-spacing: -0.5px;
+}
+
+.dot {
+    color: var(--accent-orange);
+}
+
+.nav-links {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.nav-item {
+    text-decoration: none;
+    color: var(--text-dark);
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: color 0.2s ease;
+}
+
+.nav-item:hover {
+    color: var(--accent-orange);
+}
+
+/* The "Say Hi" Pill Button in the Nav */
+.contact-pill {
+    background-color: var(--accent-orange);
+    color: white !important; /* Force white text */
+    padding: 0.5rem 1.2rem;
+    border-radius: 30px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.contact-pill:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 146, 72, 0.4);
+}
+
+/* Mobile Tweak: Hide text links, keep 'Hi' button */
+@media (max-width: 600px) {
+    .nav-item:not(.contact-pill) {
+        display: none;
+    }
+}
+
+/* --- FOOTER --- */
+footer {
+    text-align: center;
+    padding: 4rem 2rem;
+    margin-top: 4rem;
+    border-top: 1px solid rgba(0,0,0,0.05);
+    color: var(--text-dark);
+    opacity: 0.8;
+}
+
+.footer-stack {
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    font-family: monospace; /* Techy contrast to the round font */
+}
+
+.footer-stack span {
+    color: var(--accent-orange);
+}
+
+
+/* --- Mobile Responsiveness --- */
+@media (max-width: 900px) {
+    .hero-container {
+        flex-direction: column-reverse; /* Image on top for mobile */
+        text-align: center;
+        padding-top: 2rem;
+    }
+
+    .bouncy-name {
+        justify-content: center;
+        font-size: 3rem;
+    }
+
+    .skills-bar {
+        justify-content: center;
+    }
+
+    .hero-image-container {
+        height: 400px;
+        width: 100%;
+    }
+}
+
+
+/* --- PROJECTS SECTION --- */
+.projects-section {
+    max-width: 1000px;
+    margin: 4rem auto 6rem auto;
+    padding: 0 2rem;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 3rem;
+    color: var(--text-dark);
+}
+
+.project-grid {
+    display: grid;
+    /* Auto-fit: Creates as many columns as fit, min 340px wide */
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 2rem;
+}
+
+.project-card {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 30px; /* Matching your 'cookie' radius */
+    box-shadow: 0 10px 30px rgba(255, 146, 72, 0.05); /* Subtle orange glow */
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.03);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Makes cards same height */
+}
+
+.project-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(255, 146, 72, 0.15);
+}
+
+/* Typography */
+.project-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    color: var(--text-dark);
+}
+
+.project-desc {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #666; /* Softer text */
+    margin-bottom: 1.5rem;
+    flex-grow: 1; /* Pushes the tech stack to the bottom */
+}
+
+/* Tech Pills */
+.tech-stack {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: auto; /* Force to bottom */
+}
+
+.tech-tag {
+    background: var(--bg-cream);
+    color: var(--text-dark);
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+/* Status Badges */
+.status-pill {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+}
+
+.status-private { background: #F3F3F3; color: #888; }
+.status-public { background: #E6F7FF; color: #0077CC; }
+
+/* Links */
+.project-link {
+    display: inline-block;
+    margin-top: 1.5rem;
+    font-weight: 700;
+    color: var(--accent-orange);
+    text-decoration: none;
+    font-size: 0.95rem;
+}
+
+.project-link:hover {
+    text-decoration: underline;
+}
