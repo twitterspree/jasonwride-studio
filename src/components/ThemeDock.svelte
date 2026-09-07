@@ -19,8 +19,8 @@
       text: '#F0F3F8',
       card: '#121722',
       accent: '#5FBFF9',
-      glass: 'rgba(18, 23, 34, 0.65)',
-      border: 'rgba(95, 191, 249, 0.25)'
+      glass: 'rgba(18, 23, 34, 0.4)',  /* Lower opacity allows particle refraction */
+      border: 'rgba(95, 191, 249, 0.2)'
     },
     {
       id: 'editorial',
@@ -29,8 +29,8 @@
       text: '#1C1C1A',
       card: '#FCFCF9',
       accent: '#E65C00',
-      glass: 'rgba(245, 245, 240, 0.6)',
-      border: 'rgba(28, 28, 26, 0.12)'
+      glass: 'rgba(245, 245, 240, 0.45)',
+      border: 'rgba(28, 28, 26, 0.15)'
     },
     {
       id: 'forest',
@@ -39,7 +39,7 @@
       text: '#E2EBE6',
       card: '#162320',
       accent: '#48D597',
-      glass: 'rgba(22, 35, 32, 0.65)',
+      glass: 'rgba(22, 35, 32, 0.4)',
       border: 'rgba(72, 213, 151, 0.2)'
     }
   ];
@@ -59,15 +59,30 @@
     root.style.setProperty('--accent-color', theme.accent);
     root.style.setProperty('--glass-surface', theme.glass);
     root.style.setProperty('--glass-border', theme.border);
+    
+    // Explicitly sync <body> in case of layer detachment
+    if (document.body) {
+      document.body.style.backgroundColor = theme.bg;
+      document.body.style.color = theme.text;
+    }
+
+    dispatchAccent(theme.accent);
 
     if (save) {
       localStorage.setItem('jw-palette', JSON.stringify({ id: theme.id, accent: theme.accent }));
     }
   }
 
+  function dispatchAccent(color) {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('accent-color-change', { detail: { color } }));
+    }
+  }
+
   function handleAccentChange(e) {
     customAccent = e.target.value;
     document.documentElement.style.setProperty('--accent-color', customAccent);
+    dispatchAccent(customAccent);
     localStorage.setItem('jw-palette', JSON.stringify({ id: currentThemeId, accent: customAccent }));
   }
 

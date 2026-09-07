@@ -1,6 +1,8 @@
 ---
 // 1. FRONTMATTER: This is where we import styles
 import '../styles/global.css';
+// themee
+import ThemeDock from '../components/ThemeDock.svelte';
 
 // import Gallery from '../components/Gallery.svelte';
 import MarqueeGallery from '../components/MarqueeGallery.svelte'; // Add this
@@ -148,16 +150,23 @@ const myPhotos = [
 
     <script>
       // --- INTERACTION #3: Particle Background Configuration ---
+      let initialAccent = '#FF9248';
+      try {
+        const saved = localStorage.getItem('jw-palette');
+        if (saved) initialAccent = JSON.parse(saved).accent || initialAccent;
+      } catch (e) {}
+
+      let particlesContainer: any = null;
+
       // @ts-ignore
       // @ts-expect-error okay to ignore tsParticles global
-      // tsParticles uses ".load" instead of just passing the ID
       tsParticles.load("particles-js", {
         "particles": {
           "number": {
             "value": 60,
             "density": { "enable": true, "value_area": 800 }
           },
-          "color": { "value": "#FF9248" },
+          "color": { "value": initialAccent },
           "shape": { "type": "circle" },
           "opacity": { "value": 0.2, "random": true },
           "size": { "value": 5, "random": true },
@@ -191,6 +200,22 @@ const myPhotos = [
           }
         },
         "retina_detect": true
+      }).then((container: any) => {
+        particlesContainer = container;
+      });
+
+      // Update particle colors when ThemeDock switches palette
+      let refreshDebounce: any;
+      window.addEventListener('accent-color-change', (e: any) => {
+        const color = e.detail?.color;
+        if (!color || !particlesContainer) return;
+
+        particlesContainer.options.particles.color.value = color;
+
+        clearTimeout(refreshDebounce);
+        refreshDebounce = setTimeout(() => {
+          particlesContainer.refresh();
+        }, 40);
       });
 
       // --- INTERACTION #1: Bouncy Name Animation ---
@@ -271,5 +296,7 @@ const myPhotos = [
             Built with <span>Astro</span>, <span>Svelte</span> & <span>WebGL</span>.
         </p>
     </footer>
+
+    <ThemeDock client:load />
   </body>
 </html>
