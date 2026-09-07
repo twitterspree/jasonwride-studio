@@ -1,6 +1,6 @@
 ---
 import '../styles/global.css';
-import ConstellationTree from '../components/ConstellationTree.svelte';
+import RadialTree from '../components/RadialTree.svelte';
 import treeData from '../data/tree.json';
 ---
 
@@ -35,7 +35,7 @@ import treeData from '../data/tree.json';
         </p>
 
         <!-- Mount the 3D WebGL component -->
-        <ConstellationTree client:load treeData={treeData} />
+        <RadialTree client:load treeData={treeData} />
     </main>
   </body>
 </html>

@@ -1,36 +1,145 @@
 {
-  "name": "LUCA (Last Universal Common Ancestor)",
+  "name": "LUCA",
   "traits": [],
   "children": [
+    {
+      "name": "Bacteria",
+      "traits": [],
+      "children": [
+        {
+          "name": "Cyanobacteria",
+          "traits": [
+            "photosynthesis"
+          ]
+        },
+        {
+          "name": "Bioluminescent Vibrio",
+          "traits": [
+            "bioluminescence"
+          ]
+        }
+      ]
+    },
     {
       "name": "Eukarya",
       "traits": [],
       "children": [
         {
+          "name": "Plants",
+          "traits": [
+            "photosynthesis"
+          ],
+          "children": [
+            {
+              "name": "Mosses",
+              "traits": []
+            },
+            {
+              "name": "Ferns",
+              "traits": []
+            },
+            {
+              "name": "Flowering Plants",
+              "traits": []
+            }
+          ]
+        },
+        {
+          "name": "Fungi",
+          "traits": [],
+          "children": [
+            {
+              "name": "Yeast",
+              "traits": []
+            },
+            {
+              "name": "Ghost Fungus",
+              "traits": [
+                "bioluminescence"
+              ]
+            },
+            {
+              "name": "Cordyceps",
+              "traits": []
+            }
+          ]
+        },
+        {
           "name": "Animals",
           "traits": [],
           "children": [
             {
-              "name": "Vertebrates",
+              "name": "Cnidarians",
               "traits": [
-                "spinal_cord"
+                "venom"
               ],
               "children": [
                 {
-                  "name": "Humans",
+                  "name": "Jellyfish",
                   "traits": [
-                    "camera_eye",
-                    "limbs",
-                    "brain"
+                    "bioluminescence"
                   ]
                 },
                 {
-                  "name": "Birds",
+                  "name": "Sea Anemones",
+                  "traits": []
+                }
+              ]
+            },
+            {
+              "name": "Arthropods",
+              "traits": [],
+              "children": [
+                {
+                  "name": "Insects",
+                  "traits": [],
+                  "children": [
+                    {
+                      "name": "Flies",
+                      "traits": [
+                        "flight"
+                      ]
+                    },
+                    {
+                      "name": "Fireflies",
+                      "traits": [
+                        "flight",
+                        "bioluminescence"
+                      ]
+                    },
+                    {
+                      "name": "Honeybees",
+                      "traits": [
+                        "flight",
+                        "eusociality",
+                        "venom"
+                      ]
+                    },
+                    {
+                      "name": "Ants",
+                      "traits": [
+                        "eusociality",
+                        "venom"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "Arachnids",
                   "traits": [
-                    "camera_eye",
-                    "limbs",
-                    "flight",
-                    "brain"
+                    "venom"
+                  ],
+                  "children": [
+                    {
+                      "name": "Spiders",
+                      "traits": [
+                        "silk_production"
+                      ]
+                    },
+                    {
+                      "name": "Scorpions",
+                      "traits": []
+                    }
                   ]
                 }
               ]
@@ -40,61 +149,139 @@
               "traits": [],
               "children": [
                 {
-                  "name": "Octopuses",
+                  "name": "Cephalopods",
                   "traits": [
-                    "camera_eye",
-                    "limbs",
-                    "brain"
+                    "camera_eye"
+                  ],
+                  "children": [
+                    {
+                      "name": "Octopuses",
+                      "traits": [
+                        "tool_use",
+                        "venom"
+                      ]
+                    },
+                    {
+                      "name": "Bioluminescent Squid",
+                      "traits": [
+                        "bioluminescence"
+                      ]
+                    }
                   ]
                 },
                 {
-                  "name": "Snails",
-                  "traits": [
-                    "shell"
+                  "name": "Gastropods",
+                  "traits": [],
+                  "children": [
+                    {
+                      "name": "Cone Snails",
+                      "traits": [
+                        "venom"
+                      ]
+                    },
+                    {
+                      "name": "Garden Snails",
+                      "traits": []
+                    }
                   ]
                 }
               ]
             },
             {
-              "name": "Arthropods",
+              "name": "Vertebrates",
               "traits": [
-                "exoskeleton"
+                "camera_eye"
               ],
               "children": [
                 {
-                  "name": "Flies",
-                  "traits": [
-                    "compound_eye",
-                    "flight",
-                    "limbs"
+                  "name": "Fishes",
+                  "traits": [],
+                  "children": [
+                    {
+                      "name": "Sharks",
+                      "traits": [
+                        "electroreception"
+                      ]
+                    },
+                    {
+                      "name": "Electric Eels",
+                      "traits": [
+                        "electroreception"
+                      ]
+                    },
+                    {
+                      "name": "Anglerfish",
+                      "traits": [
+                        "bioluminescence"
+                      ]
+                    }
                   ]
                 },
                 {
-                  "name": "Fireflies",
-                  "traits": [
-                    "compound_eye",
-                    "flight",
-                    "limbs",
-                    "bioluminescence"
+                  "name": "Reptiles & Birds",
+                  "traits": [],
+                  "children": [
+                    {
+                      "name": "Vipers",
+                      "traits": [
+                        "venom"
+                      ]
+                    },
+                    {
+                      "name": "Falcons",
+                      "traits": [
+                        "flight"
+                      ]
+                    },
+                    {
+                      "name": "Crows",
+                      "traits": [
+                        "flight",
+                        "tool_use"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "Mammals",
+                  "traits": [],
+                  "children": [
+                    {
+                      "name": "Platypus",
+                      "traits": [
+                        "electroreception",
+                        "venom"
+                      ]
+                    },
+                    {
+                      "name": "Bats",
+                      "traits": [
+                        "flight",
+                        "echolocation"
+                      ]
+                    },
+                    {
+                      "name": "Dolphins",
+                      "traits": [
+                        "echolocation",
+                        "tool_use"
+                      ]
+                    },
+                    {
+                      "name": "Chimpanzees",
+                      "traits": [
+                        "tool_use"
+                      ]
+                    },
+                    {
+                      "name": "Humans",
+                      "traits": [
+                        "tool_use"
+                      ]
+                    }
                   ]
                 }
               ]
-            }
-          ]
-        },
-        {
-          "name": "Fungi",
-          "traits": [],
-          "children": [
-            {
-              "name": "Ghost Fungus",
-              "traits": [
-                "bioluminescence"
-              ]
-            },
-            {
-              "name": "Yeast",
-              "traits": []
             }
           ]
         }

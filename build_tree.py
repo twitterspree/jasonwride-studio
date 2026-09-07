@@ -1,54 +1,135 @@
 import json
 from pathlib import Path
 
-# The output destination in your Astro project
 OUTPUT_JSON = Path("src/data/tree.json")
 
-# Our mock hierarchical data, focusing on convergent traits
 tree_data = {
-    "name": "LUCA (Last Universal Common Ancestor)",
+    "name": "LUCA",
     "traits": [],
     "children": [
+        {
+            "name": "Bacteria",
+            "traits": [],
+            "children": [
+                {"name": "Cyanobacteria", "traits": ["photosynthesis"]},
+                {"name": "Bioluminescent Vibrio", "traits": ["bioluminescence"]}
+            ]
+        },
         {
             "name": "Eukarya",
             "traits": [],
             "children": [
                 {
-                    "name": "Animals",
-                    "traits": [],
+                    "name": "Plants",
+                    "traits": ["photosynthesis"],
                     "children": [
-                        {
-                            "name": "Vertebrates",
-                            "traits": ["spinal_cord"],
-                            "children": [
-                                {"name": "Humans", "traits": ["camera_eye", "limbs", "brain"]},
-                                {"name": "Birds", "traits": ["camera_eye", "limbs", "flight", "brain"]}
-                            ]
-                        },
-                        {
-                            "name": "Mollusks",
-                            "traits": [],
-                            "children": [
-                                {"name": "Octopuses", "traits": ["camera_eye", "limbs", "brain"]},
-                                {"name": "Snails", "traits": ["shell"]}
-                            ]
-                        },
-                        {
-                            "name": "Arthropods",
-                            "traits": ["exoskeleton"],
-                            "children": [
-                                {"name": "Flies", "traits": ["compound_eye", "flight", "limbs"]},
-                                {"name": "Fireflies", "traits": ["compound_eye", "flight", "limbs", "bioluminescence"]}
-                            ]
-                        }
+                        {"name": "Mosses", "traits": []},
+                        {"name": "Ferns", "traits": []},
+                        {"name": "Flowering Plants", "traits": []}
                     ]
                 },
                 {
                     "name": "Fungi",
                     "traits": [],
                     "children": [
+                        {"name": "Yeast", "traits": []},
                         {"name": "Ghost Fungus", "traits": ["bioluminescence"]},
-                        {"name": "Yeast", "traits": []}
+                        {"name": "Cordyceps", "traits": []}
+                    ]
+                },
+                {
+                    "name": "Animals",
+                    "traits": [],
+                    "children": [
+                        {
+                            "name": "Cnidarians",
+                            "traits": ["venom"],
+                            "children": [
+                                {"name": "Jellyfish", "traits": ["bioluminescence"]},
+                                {"name": "Sea Anemones", "traits": []}
+                            ]
+                        },
+                        {
+                            "name": "Arthropods",
+                            "traits": [],
+                            "children": [
+                                {
+                                    "name": "Insects",
+                                    "traits": [],
+                                    "children": [
+                                        {"name": "Flies", "traits": ["flight"]},
+                                        {"name": "Fireflies", "traits": ["flight", "bioluminescence"]},
+                                        {"name": "Honeybees", "traits": ["flight", "eusociality", "venom"]},
+                                        {"name": "Ants", "traits": ["eusociality", "venom"]}
+                                    ]
+                                },
+                                {
+                                    "name": "Arachnids",
+                                    "traits": ["venom"],
+                                    "children": [
+                                        {"name": "Spiders", "traits": ["silk_production"]},
+                                        {"name": "Scorpions", "traits": []}
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Mollusks",
+                            "traits": [],
+                            "children": [
+                                {
+                                    "name": "Cephalopods",
+                                    "traits": ["camera_eye"],
+                                    "children": [
+                                        {"name": "Octopuses", "traits": ["tool_use", "venom"]},
+                                        {"name": "Bioluminescent Squid", "traits": ["bioluminescence"]}
+                                    ]
+                                },
+                                {
+                                    "name": "Gastropods",
+                                    "traits": [],
+                                    "children": [
+                                        {"name": "Cone Snails", "traits": ["venom"]},
+                                        {"name": "Garden Snails", "traits": []}
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Vertebrates",
+                            "traits": ["camera_eye"],
+                            "children": [
+                                {
+                                    "name": "Fishes",
+                                    "traits": [],
+                                    "children": [
+                                        {"name": "Sharks", "traits": ["electroreception"]},
+                                        {"name": "Electric Eels", "traits": ["electroreception"]},
+                                        {"name": "Anglerfish", "traits": ["bioluminescence"]}
+                                    ]
+                                },
+                                {
+                                    "name": "Reptiles & Birds",
+                                    "traits": [],
+                                    "children": [
+                                        {"name": "Vipers", "traits": ["venom"]},
+                                        {"name": "Falcons", "traits": ["flight"]},
+                                        {"name": "Crows", "traits": ["flight", "tool_use"]}
+                                    ]
+                                },
+                                {
+                                    "name": "Mammals",
+                                    "traits": [],
+                                    "children": [
+                                        {"name": "Platypus", "traits": ["electroreception", "venom"]},
+                                        {"name": "Bats", "traits": ["flight", "echolocation"]},
+                                        {"name": "Dolphins", "traits": ["echolocation", "tool_use"]},
+                                        {"name": "Chimpanzees", "traits": ["tool_use"]},
+                                        {"name": "Humans", "traits": ["tool_use"]}
+                                    ]
+                                }
+                            ]
+                        }
                     ]
                 }
             ]
@@ -57,14 +138,10 @@ tree_data = {
 }
 
 def main():
-    # Ensure the data directory exists
     OUTPUT_JSON.parent.mkdir(parents=True, exist_ok=True)
-    
-    # Write the hierarchical structure to a JSON file
-    with open(OUTPUT_JSON, 'w', encoding='utf-8') as f:
+    with open(OUTPUT_JSON, "w", encoding="utf-8") as f:
         json.dump(tree_data, f, indent=2)
-        
-    print(f"Successfully built evolutionary tree data at {OUTPUT_JSON}")
+    print(f"Expanded tree data generated at {OUTPUT_JSON}")
 
 if __name__ == "__main__":
     main()
