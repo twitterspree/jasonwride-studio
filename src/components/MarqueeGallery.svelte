@@ -1,49 +1,74 @@
 <script>
-    import { onMount } from 'svelte';
-    
-    export let images = [];
-    let selectedImage = null;
-    let imagesLoaded = false;
+    /** @type {{ images: { id: string, thumb: string, srcset: string, width: number, height: number, full: string, alt: string }[] }} */
+    let { images = [] } = $props();
 
-    function openLightbox(img) {
-        selectedImage = img;
+    let selected = $state(null);
+    let dialog;
+    let opener = null;
+
+    // A native <dialog> opened with showModal() renders in the browser's top layer,
+    // so no z-index/stacking context can cover it, and the page behind goes inert.
+    function open(img, e) {
+        opener = e.currentTarget;
+        selected = img;
+        dialog.showModal();
     }
 
-    function closeLightbox() {
-        selectedImage = null;
+    function close() {
+        dialog.close();
     }
 
-    // New: Handle keyboard "Escape" to close
-    function handleKeydown(e) {
-        if (e.key === 'Escape') closeLightbox();
+    // Fires for the close button, backdrop clicks, and the native Escape key
+    function onClose() {
+        selected = null;
+        opener?.focus();
+        opener = null;
     }
-
-    // Preload all images before starting animation
-    onMount(() => {
-        const imagePromises = images.map(img => {
-            return new Promise((resolve, reject) => {
-                const imageEl = new Image();
-                imageEl.onload = resolve;
-                imageEl.onerror = reject;
-                imageEl.src = img.url;
-            });
-        });
-
-        Promise.all(imagePromises).then(() => {
-            imagesLoaded = true;
-        }).catch(err => {
-            console.error('Some images failed to load', err);
-            imagesLoaded = true; // Start anyway after error
-        });
-    });
 </script>
 
+<div class="marquee-container">
+    <div class="marquee-track" class:paused={selected}>
+        <!-- The track is rendered twice for a seamless loop; only the first copy is exposed -->
+        {#each [0, 1] as copy}
+            <ul class="marquee-set" aria-hidden={copy === 1 ? 'true' : undefined}>
+                {#each images as img (img.id)}
+                    <li>
+                        <button
+                            class="img-btn"
+                            onclick={(e) => open(img, e)}
+                            tabindex={copy === 1 ? -1 : undefined}
+                            aria-label="View larger: {img.alt}"
+                        >
+                            <img
+                                src={img.thumb}
+                                srcset={img.srcset}
+                                alt=""
+                                width={img.width}
+                                height={img.height}
+                                class="marquee-item"
+                                loading="lazy"
+                                decoding="async"
+                            />
+                        </button>
+                    </li>
+                {/each}
+            </ul>
+        {/each}
+    </div>
+</div>
+
+<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
+<dialog class="lightbox" bind:this={dialog} aria-label={selected?.alt} onclick={close} onclose={onClose}>
+    {#if selected}
+        <img src={selected.full} alt={selected.alt} />
+    {/if}
+    <button class="lightbox-close" onclick={close} aria-label="Close" autofocus>✕</button>
+</dialog>
+
 <style>
-    /* ... Keep your existing container/track styles ... */
     .marquee-container {
         width: 100%;
         overflow: hidden;
-        white-space: nowrap;
         position: relative;
         padding: 2rem 0;
         mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
@@ -51,61 +76,107 @@
     }
 
     .marquee-track {
-        display: inline-flex;
-        gap: 1.5rem;
+        display: flex;
+        width: max-content;
         animation: scroll 40s linear infinite;
-        animation-play-state: paused; /* Start paused */
     }
 
-    .marquee-track.loaded {
-        animation-play-state: running; /* Start animation when ready */
-    }
-
-    /* .marquee-track:hover {
+    /* Pause while the visitor is looking at (or tabbing through) a photo */
+    .marquee-track:hover,
+    .marquee-track:focus-within,
+    .marquee-track.paused {
         animation-play-state: paused;
-    } */
+    }
 
-    /* NEW: Invisible Button Style */
+    .marquee-set {
+        display: flex;
+        gap: 1.5rem;
+        padding-right: 1.5rem; /* matches gap so the loop seam is even */
+        list-style: none;
+    }
+
     .img-btn {
         background: none;
         border: none;
         padding: 0;
-        cursor: pointer;
-        outline: none; /* We handle focus visual with the image */
-        display: block; /* Ensures it behaves nicely in the flex row */
+        cursor: zoom-in;
+        display: block;
+        border-radius: 16px;
     }
 
     .marquee-item {
         height: 300px;
         width: auto;
         border-radius: 16px;
-        transition: transform 0.3s ease, filter 0.3s ease;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         object-fit: cover;
-        display: block; /* Removes tiny bottom gap inside button */
+        display: block;
+        background: var(--surface-soft);
     }
 
-    /* Apply hover effect when the BUTTON is hovered */
-    .img-btn:hover .marquee-item, 
-    .img-btn:focus .marquee-item {
+    .img-btn:hover .marquee-item,
+    .img-btn:focus-visible .marquee-item {
         transform: scale(1.05);
-        box-shadow: 0 10px 30px rgba(255, 146, 72, 0.3);
+        box-shadow: 0 10px 30px var(--accent-glow);
+    }
+
+    @media (max-width: 600px) {
+        .marquee-item {
+            height: 220px;
+        }
     }
 
     @keyframes scroll {
-        0% { transform: translateX(0); }
-        100% { transform: translateX(-50%); }
+        from { transform: translateX(0); }
+        to { transform: translateX(-50%); }
+    }
+
+    /* Reduced motion: no auto-scroll, let people swipe/scroll the strip instead */
+    @media (prefers-reduced-motion: reduce) {
+        .marquee-container {
+            overflow-x: auto;
+            mask-image: none;
+            -webkit-mask-image: none;
+        }
+        .marquee-track {
+            animation: none;
+        }
+        .marquee-set[aria-hidden='true'] {
+            display: none;
+        }
+    }
+
+    /* Lock page scroll while the lightbox is open */
+    :global(html:has(dialog.lightbox[open])) {
+        overflow: hidden;
     }
 
     .lightbox {
+        /* Reset UA dialog styles and fill the viewport */
         position: fixed;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(51,45,45, 0.9);
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        max-width: none;
+        max-height: none;
+        margin: 0;
+        padding: 0;
+        border: none;
+        background: transparent;
+        cursor: zoom-out;
+        overscroll-behavior: contain;
+    }
+
+    .lightbox[open] {
         display: flex;
         justify-content: center;
         align-items: center;
-        z-index: 2000;
-        cursor: zoom-out;
+        animation: fadeIn 0.2s ease;
+    }
+
+    .lightbox::backdrop {
+        background: rgba(20, 18, 18, 0.9);
         backdrop-filter: blur(5px);
     }
 
@@ -116,33 +187,22 @@
         box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
     }
 
-    /* Specificity fix: .marquee-track.paused (0-2-0) overrides .marquee-track.loaded (0-2-0) because it's lower in the file */
-    .marquee-track.paused {
-        animation-play-state: paused !important;
+    .lightbox-close {
+        position: absolute;
+        top: 1.25rem;
+        right: 1.25rem;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.12);
+        color: #fff;
+        font-size: 1.1rem;
+        cursor: pointer;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
     }
 </style>
-
-<svelte:window on:keydown={handleKeydown} />
-
-<div class="marquee-container">
-    <div class="marquee-track {selectedImage ? 'paused' : ''} {imagesLoaded ? 'loaded' : ''}">
-        
-        {#each images as img}
-            <button class="img-btn" on:click={() => openLightbox(img)} aria-label={img.alt}>
-                <img src={img.url} alt={img.alt} class="marquee-item" loading="eager" />
-            </button>
-        {/each}
-
-        {#each images as img}
-            <button class="img-btn" on:click={() => openLightbox(img)} aria-label={img.alt}>
-                <img src={img.url} alt={img.alt} class="marquee-item" loading="eager" />
-            </button>
-        {/each}
-    </div>
-</div>
-
-{#if selectedImage}
-    <button class="lightbox" on:click={closeLightbox} aria-label="Close lightbox">
-        <img src={selectedImage.url} alt={selectedImage.alt} />
-    </button>
-{/if}

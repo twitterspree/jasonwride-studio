@@ -1,12 +1,11 @@
 {
 	"$schema": "./node_modules/wrangler/config-schema.json",
-	"compatibility_date": "2026-08-12",
-	"compatibility_flags": ["global_fetch_strictly_public"],
 	"name": "jasonwride-studio",
-	"main": "@astrojs/cloudflare/entrypoints/server",
+	"compatibility_date": "2026-08-12",
+	// Static-only deploy: no Worker script, just the built site.
 	"assets": {
 		"directory": "./dist",
-		"binding": "ASSETS"
+		"not_found_handling": "404-page"
 	},
 	"observability": {
 		"enabled": true

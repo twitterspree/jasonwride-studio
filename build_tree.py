@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 OUTPUT_JSON = Path("src/data/tree.json")
+TRAITS_JSON = Path("src/data/traits.json")
 
 tree_data = {
     "name": "LUCA",
@@ -137,7 +138,31 @@ tree_data = {
     ]
 }
 
+def collect(node, traits, names):
+    traits.update(node.get("traits", []))
+    names.append(node["name"])
+    for child in node.get("children", []):
+        collect(child, traits, names)
+
+
+def validate(tree):
+    """Fail loudly if the tree and the trait write-ups drift apart."""
+    traits, names = set(), []
+    collect(tree, traits, names)
+
+    dupes = {n for n in names if names.count(n) > 1}
+    if dupes:
+        raise SystemExit(f"Duplicate node names: {sorted(dupes)}")
+
+    described = set(json.loads(TRAITS_JSON.read_text(encoding="utf-8")))
+    if missing := traits - described:
+        raise SystemExit(f"Traits missing from {TRAITS_JSON}: {sorted(missing)}")
+    if unused := described - traits:
+        print(f"Warning: {TRAITS_JSON} describes traits not in the tree: {sorted(unused)}")
+
+
 def main():
+    validate(tree_data)
     OUTPUT_JSON.parent.mkdir(parents=True, exist_ok=True)
     with open(OUTPUT_JSON, "w", encoding="utf-8") as f:
         json.dump(tree_data, f, indent=2)

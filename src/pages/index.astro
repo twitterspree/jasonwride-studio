@@ -1,302 +1,161 @@
 ---
-// 1. FRONTMATTER: This is where we import styles
-import '../styles/global.css';
-// themee
-import ThemeDock from '../components/ThemeDock.svelte';
-
-// import Gallery from '../components/Gallery.svelte';
-import MarqueeGallery from '../components/MarqueeGallery.svelte'; // Add this
-
+import { loadPhotos } from '../lib/photos';
+import { loadPortrait } from '../lib/portrait';
+import Base from '../layouts/Base.astro';
+import MarqueeGallery from '../components/MarqueeGallery.svelte';
 import DepthProfile from '../components/DepthProfile.svelte';
 import DraggableSkills from '../components/DraggableSkills.svelte';
 
-const myPhotos = [
-    { url: '/photos/IMG_7799.avif', alt: 'Featured shot by Jason Wride' },
-    { url: '/photos/IMG_8004-2.avif', alt: 'Featured shot by Jason Wride' },
-    { url: '/photos/IMG_8504.avif', alt: 'Featured shot by Jason Wride' },
-    { url: '/photos/IMG_8545-2.avif', alt: 'Featured shot by Jason Wride' },
-    { url: '/photos/IMG_8686-2.avif', alt: 'Featured shot by Jason Wride' },
-    { url: '/photos/IMG_8907.avif', alt: 'Featured shot by Jason Wride' },
-    { url: '/photos/IMG_8934.avif', alt: 'Featured shot by Jason Wride' }
-];
+const portrait = await loadPortrait();
+const photos = await loadPhotos();
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Jason Wride | IS Student & Photographer</title>
-    <!-- Placeholder favicon — swap for a real branded SVG once the color palette is settled -->
-    <link rel="icon" href="https://fav.farm/🍪" />
+<Base
+  title="Jason Wride | IS Student & Photographer"
+  description="Portfolio of Jason Wride — Information Systems student, developer, and photographer at the University of Utah."
+  particles
+>
+  <link slot="head" rel="preload" as="image" href={portrait.src} fetchpriority="high" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;800&display=swap" rel="stylesheet">
+  <main class="hero-container">
+    <div class="hero-content">
+      <h1 class="bouncy-name">Hi, I'm Jason Wride.</h1>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+      <p class="subtitle">IS Student. Photographer. Creator. University of Utah.</p>
+      <p class="intro-text">
+        Welcome to my studio. This is where code meets creativity, or whatever it is I waste my time on. Take a look
+        around or hmu.
+      </p>
 
-    <script is:inline src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js"></script>
+      <DraggableSkills client:visible />
 
-    <!-- Social/link preview metadata -->
-    <meta name="description" content="Portfolio of Jason Wride. IS Student, Developer, and Photographer at the University of Utah." />
-    <meta property="og:title" content="Jason Wride | Studio" />
-    <meta property="og:description" content="IS Student. Photographer. Creator. Check out my interactive portfolio." />
-    <meta property="og:image" content="https://jasonwride.studio/profilepictiny.avif" />
-    <meta property="og:url" content="https://jasonwride.studio" />
-    <meta property="og:type" content="website" />
+      <a href="mailto:jason.wride@utah.edu" class="cta-button">Get in Touch</a>
+    </div>
 
-  </head>
-  <body>
+    <div class="hero-image-container">
+      <DepthProfile client:load {...portrait} alt="Portrait of Jason Wride" />
+    </div>
+  </main>
 
-	<nav class="navbar">
-    	<div class="logo">jasonwride<span class="dot">.studio</span></div>
-    	<div class="nav-links">
-        	<a href="#shots" class="nav-item">Photos</a>
-       		<a href="#projects" class="nav-item">Projects</a>
+  <section id="shots" class="gallery-section" aria-labelledby="shots-title">
+    <h2 id="shots-title" class="section-title">Photo slides...</h2>
+    <MarqueeGallery client:visible images={photos} />
+  </section>
 
-        	<a href="mailto:jason.wride@utah.edu" class="nav-item contact-pill">Hi! 👋</a>
-    	</div>
-	</nav>
+  <section id="projects" class="projects-section" aria-labelledby="projects-title">
+    <h2 id="projects-title" class="section-title">Technical Projects</h2>
 
-
-    <div id="particles-js"></div>
-
-    <main class="hero-container">
-        <div class="hero-content">
-            <h1 class="bouncy-name">Hi, I'm Jason Wride.</h1>
-
-            <h2 class="subtitle">IS Student. Photographer. Creator. at University of Utah.</h2>
-            <p class="intro-text">Welcome to my studio. This is where code meets creativity, or whatever it is I waste my time on. Take a look around or hmu.</p>
-
-            <DraggableSkills client:load />
-
-            <a href="mailto:jason.wride@utah.edu" class="cta-button">Get in Touch</a>
-        </div>
-
-        <div class="hero-image-container tilt-effect">
-			<DepthProfile 
-				client:load 
-				src="/profilepictiny.avif" 
-				depthSrc="/profile-depthv2.png" 
-				alt="Jason Wride Portrait"
-			/>
-        </div>
-    </main>
-
-
-	<section id="shots" class="gallery-section">
-        <h2 class="section-title">Photo slides...</h2>
-
-        <MarqueeGallery client:load images={myPhotos} />
-    </section>
-
-    <section id="projects" class="projects-section">
-        <h2 class="section-title">Technical Projects</h2>
-
-        <div class="project-grid">
-
-            <div class="project-card">
-                <span class="status-pill status-public">Interactive</span>
-                <h3 class="project-title">The Tree of Life</h3>
-                <p class="project-desc">
-                    A high-performance, interactive data visualization mapping convergent evolution. <br><br>
-                    Engineered with a custom recursive layout algorithm and rendered natively on the HTML5 Canvas API to maintain 60FPS while drawing deep hierarchical datasets.
-                </p>
-                <div class="tech-stack">
-                    <span class="tech-tag">Svelte</span>
-                    <span class="tech-tag">Canvas API</span>
-                    <span class="tech-tag">Python (Data Pipeline)</span>
-                </div>
-    
-                <!-- This links directly to your new Astro page -->
-                <a href="/tree-of-life" class="project-link">Explore the Tree &rarr;</a>
-            </div>
-            
-            <div class="project-card">
-                <span class="status-pill status-private">Private Repo</span>
-                <h3 class="project-title">Local RAG AI Assistant</h3>
-                <p class="project-desc">
-                    A native macOS/iOS app that leverages local LLMs (via Ollama) to perform Retrieval-Augmented Generation (RAG) on iMessage history. <br><br>
-                    Engineered to allow semantic search and "chat with your texts" functionality while maintaining 100% data privacy and offline capability.
-                </p>
-                <div class="tech-stack">
-                    <span class="tech-tag">SwiftUI</span>
-                    <span class="tech-tag">Ollama</span>
-                    <span class="tech-tag">Vector DB</span>
-                    <span class="tech-tag">Local LLM</span>
-                </div>
-            </div>
-
-            <div class="project-card">
-                <span class="status-pill status-public">Public Repo</span>
-                <h3 class="project-title">JasonWride.Studio</h3>
-                <p class="project-desc">
-                    A high-performance portfolio site featuring 3D WebGL depth mapping, Svelte-powered reactive components, and serverless architecture. <br><br>
-                    Optimized for 100/100 Lighthouse performance scores and deployed via Vercel Edge Network.
-                </p>
-                <div class="tech-stack">
-                    <span class="tech-tag">Astro</span>
-                    <span class="tech-tag">Svelte</span>
-                    <span class="tech-tag">WebGL</span>
-                    <span class="tech-tag">TypeScript</span>
-                </div>
-                <a href="https://github.com/twitterspree/jasonwride.studio" target="_blank" class="project-link">View Source Code &rarr;</a>
-            </div>
-
-            </div>
-    </section>
-
-
-
-    <script>
-      // --- INTERACTION #3: Particle Background Configuration ---
-      let initialAccent = '#FF9248';
-      try {
-        const saved = localStorage.getItem('jw-palette');
-        if (saved) initialAccent = JSON.parse(saved).accent || initialAccent;
-      } catch (e) {}
-
-      let particlesContainer: any = null;
-
-      // @ts-ignore
-      // @ts-expect-error okay to ignore tsParticles global
-      tsParticles.load("particles-js", {
-        "particles": {
-          "number": {
-            "value": 60,
-            "density": { "enable": true, "value_area": 800 }
-          },
-          "color": { "value": initialAccent },
-          "shape": { "type": "circle" },
-          "opacity": { "value": 0.2, "random": true },
-          "size": { "value": 5, "random": true },
-          "move": {
-            "enable": true,
-            "speed": 1,
-            "direction": "none",
-            "random": true,
-            "straight": false,
-            "out_mode": "out",
-            "bounce": false
-          }
-        },
-        "interactivity": {
-          "detect_on": "window",
-          "events": {
-            "onhover": { 
-                "enable": true, 
-                "mode": "bubble" 
-            },
-            "onclick": { "enable": false },
-            "resize": true
-          },
-          "modes": {
-            "bubble": {
-              "distance": 300, 
-              "size": 8,       
-              "opacity": 0.3,
-              "mix": false
-            }
-          }
-        },
-        "retina_detect": true
-      }).then((container: any) => {
-        particlesContainer = container;
-      });
-
-      // Update particle colors when ThemeDock switches palette
-      let refreshDebounce: any;
-      window.addEventListener('accent-color-change', (e: any) => {
-        const color = e.detail?.color;
-        if (!color || !particlesContainer) return;
-
-        particlesContainer.options.particles.color.value = color;
-
-        clearTimeout(refreshDebounce);
-        refreshDebounce = setTimeout(() => {
-          particlesContainer.refresh();
-        }, 40);
-      });
-
-      // --- INTERACTION #1: Bouncy Name Animation ---
-      const nameContainer = document.querySelector('.bouncy-name') as HTMLElement;
-      
-      if (nameContainer) {
-          const nameText = nameContainer.textContent || '';
-          nameContainer.textContent = '';
-
-          nameText.split('').forEach((letter, i) => {
-              const span = document.createElement('span');
-              if (letter === ' ') {
-                  span.innerHTML = '&nbsp;';
-              } else {
-                  span.textContent = letter;
-              }
-              span.classList.add('bouncy-letter');
-              span.style.animationDelay = `${i * 0.05}s`;
-
-              let isRising = false;
-
-              span.addEventListener('mouseenter', () => {
-                  if (span.classList.contains('loaded')) {
-                      span.classList.add('up');
-                      isRising = true;
-
-                      setTimeout(() => {
-                          isRising = false;
-                          if (!span.matches(':hover')) {
-                              span.classList.remove('up');
-                          }
-                      }, 300); 
-                  }
-              });
-
-              span.addEventListener('mouseleave', () => {
-                  if (!isRising) {
-                      span.classList.remove('up');
-                  }
-              });
-              
-              span.addEventListener('animationend', () => {
-                  span.classList.add('loaded');
-                  span.style.animationDelay = '0s';
-              });
-
-              nameContainer.appendChild(span);
-          });
-      }
-
-      // --- INTERACTION #4: 3D Image Tilt Effect ---
-      const tiltContainer = document.querySelector('.tilt-effect') as HTMLElement;
-      const tiltImg = tiltContainer?.querySelector('.hero-img') as HTMLElement;
-
-      if (tiltContainer && tiltImg) {
-          tiltContainer.addEventListener('mousemove', (e) => {
-              const rect = tiltContainer.getBoundingClientRect();
-              const width = rect.width;
-              const height = rect.height;
-              const mouseX = e.clientX - rect.left - width / 2;
-              const mouseY = e.clientY - rect.top - height / 2;
-              const rotateY = mouseX / 25; 
-              const rotateX = mouseY / -25;
-
-              tiltImg.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
-          });
-
-          tiltContainer.addEventListener('mouseleave', () => {
-              tiltImg.style.transform = 'rotateY(-5deg) rotateX(5deg) scale(1)';
-          });
-      }
-    </script>
-
-
-    <footer>
-        <p>&copy; {new Date().getFullYear()} Jason Wride. All rights reserved.</p>
-        <p class="footer-stack">
-            Built with <span>Astro</span>, <span>Svelte</span> & <span>WebGL</span>.
+    <div class="project-grid">
+      <article class="project-card">
+        <span class="status-pill status-public">Interactive</span>
+        <h3 class="project-title">The Tree of Life</h3>
+        <p class="project-desc">
+          An interactive radial cladogram mapping convergent evolution — pick a trait like flight or venom and watch
+          the unrelated lineages that evolved it light up.
         </p>
-    </footer>
+        <p class="project-desc">
+          Custom recursive layout rendered straight to the HTML5 Canvas API, with no charting library.
+        </p>
+        <ul class="tech-stack" aria-label="Tech stack">
+          <li class="tech-tag">Svelte</li>
+          <li class="tech-tag">Canvas API</li>
+          <li class="tech-tag">Python</li>
+        </ul>
+        <a href="/tree-of-life" class="project-link">Explore the Tree &rarr;</a>
+      </article>
 
-    <ThemeDock client:load />
-  </body>
-</html>
+      <article class="project-card">
+        <span class="status-pill status-private">Private Repo</span>
+        <h3 class="project-title">Local RAG AI Assistant</h3>
+        <p class="project-desc">
+          A native macOS/iOS app that leverages local LLMs (via Ollama) to perform Retrieval-Augmented Generation (RAG)
+          on iMessage history.
+        </p>
+        <p class="project-desc">
+          Engineered to allow semantic search and "chat with your texts" functionality while maintaining 100% data
+          privacy and offline capability.
+        </p>
+        <ul class="tech-stack" aria-label="Tech stack">
+          <li class="tech-tag">SwiftUI</li>
+          <li class="tech-tag">Ollama</li>
+          <li class="tech-tag">Vector DB</li>
+          <li class="tech-tag">Local LLM</li>
+        </ul>
+      </article>
+
+      <article class="project-card">
+        <span class="status-pill status-public">Public Repo</span>
+        <h3 class="project-title">JasonWride.Studio</h3>
+        <p class="project-desc">
+          This site: a static Astro build with Svelte islands, a WebGL depth-mapped portrait, and a themeable design
+          system.
+        </p>
+        <p class="project-desc">Deployed on Cloudflare's edge network, with images optimized at build time.</p>
+        <ul class="tech-stack" aria-label="Tech stack">
+          <li class="tech-tag">Astro</li>
+          <li class="tech-tag">Svelte</li>
+          <li class="tech-tag">WebGL</li>
+          <li class="tech-tag">TypeScript</li>
+        </ul>
+        <a href="https://github.com/twitterspree/jasonwride-studio" target="_blank" rel="noopener" class="project-link"
+          >View Source Code &rarr;</a
+        >
+      </article>
+    </div>
+  </section>
+</Base>
+
+<script>
+  // Bouncy name: split the heading into letters that wave in, then hop on hover
+  const nameEl = document.querySelector<HTMLElement>('.bouncy-name');
+
+  if (nameEl) {
+    const text = nameEl.textContent ?? '';
+    nameEl.setAttribute('aria-label', text); // the letter spans below are aria-hidden
+    nameEl.textContent = '';
+
+    // Letters are grouped per word so lines only break between words
+    let i = 0;
+    text.split(' ').forEach((word, w, words) => {
+      const wordEl = document.createElement('span');
+      wordEl.className = 'bouncy-word';
+      wordEl.setAttribute('aria-hidden', 'true');
+
+      for (const letter of word) {
+        const span = document.createElement('span');
+        span.textContent = letter;
+        span.className = 'bouncy-letter';
+        span.style.animationDelay = `${i++ * 0.05}s`;
+
+        let isRising = false;
+
+        span.addEventListener('mouseenter', () => {
+          if (!span.classList.contains('loaded')) return;
+          span.classList.add('up');
+          isRising = true;
+          setTimeout(() => {
+            isRising = false;
+            if (!span.matches(':hover')) span.classList.remove('up');
+          }, 300);
+        });
+
+        span.addEventListener('mouseleave', () => {
+          if (!isRising) span.classList.remove('up');
+        });
+
+        span.addEventListener('animationend', () => {
+          span.classList.add('loaded');
+          span.style.animationDelay = '0s';
+        });
+
+        wordEl.appendChild(span);
+      }
+
+      nameEl.appendChild(wordEl);
+      if (w < words.length - 1) {
+        nameEl.append(' ');
+        i++; // keep the wave's rhythm across the space
+      }
+    });
+  }
+</script>

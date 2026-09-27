@@ -1,0 +1,339 @@
+---
+import Concept from '../../layouts/Concept.astro';
+import DepthProfile from '../../components/DepthProfile.svelte';
+import DraggableSkills from '../../components/DraggableSkills.svelte';
+import RepelName from '../../components/concepts/RepelName.svelte';
+import { loadPhotos, CAMERA } from '../../lib/photos';
+import { loadPortrait } from '../../lib/portrait';
+
+const photos = await loadPhotos(520);
+const portrait = await loadPortrait();
+
+const index = [
+  { no: '01', status: 'Ongoing', title: 'Photography', kind: 'Portraits, couples, groups', stack: `${CAMERA}`, href: '#photos', preview: photos[1]?.thumb },
+  { no: '02', status: 'Live', title: 'Tree of Life', kind: 'Interactive data viz', stack: 'Svelte, Canvas 2D, Python', href: '/tree-of-life', preview: null, word: 'Venom ×5' },
+  { no: '03', status: 'Private', title: 'Local RAG Assistant', kind: 'macOS / iOS app', stack: 'SwiftUI, Ollama, Vector DB', href: null, preview: null, word: 'Offline.' },
+  { no: '04', status: 'Live', title: 'jasonwride.studio', kind: 'This website', stack: 'Astro, Svelte, WebGL', href: 'https://github.com/twitterspree/jasonwride-studio', preview: null, word: '← You are here' },
+];
+---
+
+<Concept title="Swiss Index" current="swiss" fonts="family=Archivo:wdth,wght@62..125,300..900&family=JetBrains+Mono:wght@400;600">
+  <div class="grid-overlay" aria-hidden="true">
+    {Array.from({ length: 12 }).map(() => <span></span>)}
+  </div>
+
+  <div class="page">
+    <header class="masthead">
+      <span>jasonwride.studio</span>
+      <span>Index / Photographs / Contact</span>
+      <button class="grid-toggle" type="button" aria-pressed="false">Show grid</button>
+    </header>
+
+    <section class="hero" data-skill-bounds>
+      <div class="hero-name">
+        <RepelName client:load text="JASON WRIDE" />
+      </div>
+      <div class="hero-meta">
+        <p class="label">(About)</p>
+        <p class="about">
+          Information systems student at the University of Utah. Photographer. Writes software for fun and occasionally
+          for credit.
+        </p>
+        <p class="label">(Throwables)</p>
+        <DraggableSkills client:visible />
+      </div>
+      <figure class="hero-portrait">
+        <DepthProfile client:load {...portrait} alt="Portrait of Jason Wride" />
+        <figcaption class="label">Fig. A — Self, duotone. Hover for colour.</figcaption>
+      </figure>
+    </section>
+
+    <section class="block" aria-labelledby="index-title">
+      <h2 id="index-title" class="block-title"><span class="label">(01)</span>Index</h2>
+      <table class="index">
+        <thead>
+          <tr><th>No.</th><th>Status</th><th>Project</th><th class="hide-sm">Type</th><th class="hide-sm">Stack</th></tr>
+        </thead>
+        <tbody>
+          {index.map((row) => (
+            <tr data-preview={row.preview ?? ''} data-word={row.word ?? ''}>
+              <td class="mono">{row.no}</td>
+              <td class="mono">{row.status}</td>
+              <td class="title">{row.href ? <a href={row.href}>{row.title}</a> : row.title}</td>
+              <td class="hide-sm">{row.kind}</td>
+              <td class="hide-sm mono">{row.stack}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
+
+    <section id="photos" class="block" aria-labelledby="photos-title">
+      <h2 id="photos-title" class="block-title"><span class="label">(02)</span>Photographs</h2>
+      <div class="photos">
+        {photos.map((p, i) => (
+          <figure class:list={['photo', p.portrait && 'tall']}>
+            <img src={p.full} alt={p.alt} loading="lazy" decoding="async" />
+            <figcaption>
+              <span class="mono">{String(i + 1).padStart(2, '0')}</span>
+              <span>{p.alt}</span>
+              <span class="mono exif">{p.exif}</span>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    </section>
+
+    <footer class="block contact">
+      <p class="label">(03) Contact</p>
+      <a href="mailto:jason.wride@utah.edu" class="mail">jason.wride<br />@utah.edu</a>
+    </footer>
+  </div>
+
+  <div class="preview" aria-hidden="true"><img alt="" /><span></span></div>
+</Concept>
+
+<script>
+  // Grid overlay toggle
+  const toggle = document.querySelector<HTMLButtonElement>('.grid-toggle');
+  toggle?.addEventListener('click', () => {
+    const on = document.body.classList.toggle('show-grid');
+    toggle.setAttribute('aria-pressed', String(on));
+    toggle.textContent = on ? 'Hide grid' : 'Show grid';
+  });
+
+  // Floating preview that follows the cursor over index rows
+  const preview = document.querySelector<HTMLElement>('.preview')!;
+  const img = preview.querySelector('img')!;
+  const word = preview.querySelector('span')!;
+  let px = 0, py = 0, tx = 0, ty = 0, raf = 0;
+
+  const follow = () => {
+    px += (tx - px) * 0.18;
+    py += (ty - py) * 0.18;
+    preview.style.transform = `translate(${px}px, ${py}px) rotate(${(tx - px) * 0.05}deg)`;
+    raf = requestAnimationFrame(follow);
+  };
+
+  document.querySelectorAll<HTMLTableRowElement>('.index tbody tr').forEach((row) => {
+    row.addEventListener('pointerenter', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      const src = row.dataset.preview;
+      img.hidden = !src;
+      if (src) img.src = src;
+      word.textContent = src ? '' : row.dataset.word ?? '';
+      preview.classList.toggle('is-word', !src);
+      tx = px = e.clientX + 24;
+      ty = py = e.clientY - 80;
+      preview.classList.add('on');
+      if (!raf) raf = requestAnimationFrame(follow);
+    });
+    row.addEventListener('pointermove', (e) => {
+      tx = e.clientX + 24;
+      ty = e.clientY - 80;
+    });
+    row.addEventListener('pointerleave', () => {
+      preview.classList.remove('on');
+      cancelAnimationFrame(raf);
+      raf = 0;
+    });
+  });
+</script>
+
+<style is:global>
+  :root {
+    --paper: #f6f5f1;
+    --ink: #0e0e0e;
+    --blue: #2438ff;
+    --grey: #767676;
+    --bg-base: var(--paper);
+    --text-base: var(--ink);
+    --card-bg: #fff;
+    --border-subtle: var(--ink);
+    --shadow-soft: 4px 4px 0 var(--ink);
+    --accent-color: var(--blue);
+    --accent-glow: rgba(36, 56, 255, 0.3);
+  }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Archivo', Helvetica, Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.45;
+  }
+  a { color: inherit; }
+  ::selection { background: var(--blue); color: #fff; }
+</style>
+
+<style>
+  .page { padding: 1.25rem clamp(1rem, 3vw, 2.5rem) 8rem; }
+
+  .grid-overlay {
+    position: fixed;
+    inset: 0;
+    padding: 0 clamp(1rem, 3vw, 2.5rem);
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 1.25rem;
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .grid-overlay span { background: rgba(36, 56, 255, 0.07); border-inline: 1px solid rgba(36, 56, 255, 0.25); }
+  :global(body.show-grid) .grid-overlay { opacity: 1; }
+
+  .label, .mono { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; letter-spacing: 0.02em; }
+  .label { color: var(--grey); text-transform: uppercase; }
+
+  .masthead {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 0.8rem;
+  }
+  .masthead span:nth-child(2) { text-align: center; }
+  .grid-toggle {
+    justify-self: end;
+    font: inherit;
+    text-transform: uppercase;
+    background: var(--ink);
+    color: var(--paper);
+    border: 0;
+    padding: 0.35rem 0.7rem;
+    cursor: pointer;
+  }
+  .grid-toggle:hover, .grid-toggle[aria-pressed='true'] { background: var(--blue); }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 1.25rem;
+    padding: 2.5rem 0 4rem;
+    border-bottom: 2px solid var(--ink);
+  }
+  .hero-name { grid-column: 1 / -1; margin-bottom: 2rem; }
+  .hero-meta { grid-column: 1 / 6; display: flex; flex-direction: column; gap: 0.6rem; }
+  .about { font-size: 1.5rem; line-height: 1.25; font-weight: 500; max-width: 26ch; margin-bottom: 1.5rem; font-variation-settings: 'wdth' 90; }
+  .hero-portrait { grid-column: 8 / -1; }
+  /* Duotone: greyscale portrait multiplied onto Klein-ish blue; full colour on hover */
+  .hero-portrait :global(.depth-container) {
+    height: 460px;
+    border-radius: 0;
+    background: var(--blue);
+    isolation: isolate;
+  }
+  .hero-portrait :global(.depth-container canvas),
+  .hero-portrait :global(.depth-container img) {
+    filter: grayscale(1) contrast(1.2) brightness(1.15);
+    mix-blend-mode: multiply;
+    transition: filter 0.5s ease;
+  }
+  .hero-portrait:hover :global(.depth-container canvas),
+  .hero-portrait:hover :global(.depth-container img) {
+    filter: none;
+    mix-blend-mode: normal;
+  }
+  .hero-portrait figcaption { margin-top: 0.6rem; }
+
+  /* ---------- Blocks ---------- */
+  .block { padding: 3rem 0; border-bottom: 2px solid var(--ink); }
+  .block-title {
+    display: flex;
+    gap: 1rem;
+    align-items: baseline;
+    font-size: clamp(2.5rem, 7vw, 5.5rem);
+    font-weight: 800;
+    font-variation-settings: 'wdth' 125;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 2rem;
+  }
+
+  /* ---------- Index table ---------- */
+  .index { width: 100%; border-collapse: collapse; }
+  .index th {
+    text-align: left;
+    font: 400 0.7rem 'JetBrains Mono', monospace;
+    text-transform: uppercase;
+    color: var(--grey);
+    padding: 0 0.5rem 0.6rem 0;
+    border-bottom: 1px solid var(--ink);
+  }
+  .index td { padding: 1.1rem 0.5rem 1.1rem 0; border-bottom: 1px solid var(--ink); vertical-align: baseline; }
+  .index .title { font-size: clamp(1.4rem, 3vw, 2.2rem); font-weight: 700; font-variation-settings: 'wdth' 100; transition: font-variation-settings 0.35s ease; }
+  .index .title a { text-decoration: none; }
+  .index tbody tr { transition: background 0.15s, color 0.15s; cursor: default; }
+  .index tbody tr:hover { background: var(--blue); color: #fff; }
+  .index tbody tr:hover .title { font-variation-settings: 'wdth' 125; }
+  .index tbody tr:hover .label { color: #fff; }
+
+  /* ---------- Photos ---------- */
+  .photos { display: grid; grid-template-columns: repeat(12, 1fr); gap: 3rem 1.25rem; }
+  .photo { grid-column: span 6; }
+  .photo:nth-child(3n) { grid-column: 3 / span 8; }
+  .photo.tall { grid-column: span 4; }
+  .photo img { width: 100%; height: auto; transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
+  .photo:hover img { transform: scale(1.015); }
+  .photo figcaption {
+    display: grid;
+    grid-template-columns: 2.5rem 1fr;
+    gap: 0.1rem 0.5rem;
+    margin-top: 0.6rem;
+    font-size: 0.85rem;
+  }
+  .photo .exif { grid-column: 2; color: var(--grey); }
+
+  /* ---------- Contact ---------- */
+  .contact { border-bottom: 0; }
+  .mail {
+    display: inline-block;
+    margin-top: 1rem;
+    font-size: clamp(2.5rem, 9vw, 8rem);
+    font-weight: 900;
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    text-decoration: none;
+    font-variation-settings: 'wdth' 62;
+    transition: font-variation-settings 0.6s cubic-bezier(0.3, 1.4, 0.5, 1), color 0.2s;
+  }
+  .mail:hover { font-variation-settings: 'wdth' 125; color: var(--blue); }
+
+  /* ---------- Cursor preview ---------- */
+  .preview {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 200;
+    pointer-events: none;
+    width: 240px;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .preview:global(.on) { opacity: 1; }
+  .preview img { width: 100%; height: auto; box-shadow: 6px 6px 0 var(--ink); }
+  .preview span { display: none; }
+  .preview:global(.is-word) span {
+    display: block;
+    background: var(--ink);
+    color: #fff;
+    padding: 1.2rem 1rem;
+    font-size: 2rem;
+    font-weight: 900;
+    font-variation-settings: 'wdth' 75;
+    line-height: 1;
+    box-shadow: 6px 6px 0 var(--blue);
+  }
+
+  @media (max-width: 860px) {
+    .hero-meta, .hero-portrait { grid-column: 1 / -1; }
+    .photo, .photo:nth-child(3n), .photo.tall { grid-column: 1 / -1; }
+    .masthead span:nth-child(2), .hide-sm { display: none; }
+    .masthead { grid-template-columns: 1fr auto; }
+  }
+</style>

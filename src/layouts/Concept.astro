@@ -1,0 +1,80 @@
+---
+interface Props {
+  title: string;
+  /** Google Fonts css2 query, e.g. "family=Fraunces:opsz,wght@9..144,300..900" */
+  fonts: string;
+  current: 'book' | 'contact-sheet' | 'swiss';
+}
+const { title, fonts, current } = Astro.props;
+
+const concepts = [
+  { id: 'book', label: 'The Book' },
+  { id: 'contact-sheet', label: 'Contact Sheet' },
+  { id: 'swiss', label: 'Swiss Index' },
+] as const;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>{title} — concept | jasonwride.studio</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href={`https://fonts.googleapis.com/css2?${fonts}&display=swap`} rel="stylesheet" />
+  </head>
+  <body>
+    <slot />
+
+    <nav class="concept-switcher" aria-label="Design concepts">
+      <span class="cs-label">Concept</span>
+      {concepts.map((c) => (
+        <a href={`/concepts/${c.id}`} aria-current={c.id === current ? 'page' : undefined}>{c.label}</a>
+      ))}
+      <a href="/" class="cs-live">Live site ↗</a>
+    </nav>
+
+    <style is:global>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      img { display: block; max-width: 100%; }
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+      }
+    </style>
+
+    <style>
+      .concept-switcher {
+        position: fixed;
+        left: 50%;
+        bottom: 1rem;
+        transform: translateX(-50%);
+        z-index: 9000;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.3rem;
+        border-radius: 999px;
+        background: #111;
+        color: #eee;
+        font: 500 12px/1 ui-monospace, 'SF Mono', Menlo, monospace;
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+        max-width: calc(100vw - 1rem);
+        overflow-x: auto;
+      }
+      .cs-label { padding: 0 0.6rem; opacity: 0.5; text-transform: uppercase; letter-spacing: 0.1em; }
+      .concept-switcher a {
+        color: inherit;
+        text-decoration: none;
+        padding: 0.5rem 0.8rem;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+      .concept-switcher a:hover { background: #2a2a2a; }
+      .concept-switcher a[aria-current='page'] { background: #eee; color: #111; }
+      .cs-live { opacity: 0.6; }
+    </style>
+  </body>
+</html>

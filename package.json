@@ -6,20 +6,21 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "check": "astro check",
+    "deploy": "astro build && wrangler deploy",
     "astro": "astro",
-    "generate-types": "wrangler types"
+    "tree": "python3 build_tree.py"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "14.3.0",
     "@astrojs/svelte": "^9.0.1",
     "astro": "7.3.1",
-    "svelte": "^5.44.0",
-    "three": "^0.185.1",
-    "typescript": "^5.9.3",
-    "wrangler": "^4.122.0"
+    "simple-icons": "^16.32.0",
+    "svelte": "^5.44.0"
   },
   "devDependencies": {
-    "@types/three": "^0.185.4",
-    "repomix": "^1.18.0"
+    "@astrojs/check": "^0.9.10",
+    "repomix": "^1.18.0",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.141.0"
   }
 }

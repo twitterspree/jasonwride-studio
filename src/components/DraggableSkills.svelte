@@ -1,150 +1,228 @@
 <script>
     import { onMount } from 'svelte';
+    import { siTypescript, siSvelte, siSwift, siPython } from 'simple-icons';
 
-    let icons = [
-        { id: 'html', class: 'fab fa-html5', colorClass: 'html', tooltip: 'HTML5 Structure', x: 0, y: 0, vx: 0, vy: 0, dragging: false },
-        { id: 'css', class: 'fab fa-css3-alt', colorClass: 'css', tooltip: 'CSS3 Styling', x: 0, y: 0, vx: 0, vy: 0, dragging: false },
-        { id: 'js', class: 'fab fa-js-square', colorClass: 'js', tooltip: 'JavaScript Logic', x: 0, y: 0, vx: 0, vy: 0, dragging: false },
-        { id: 'photo', class: 'fas fa-camera-retro', colorClass: 'photo', tooltip: 'Photography & Visuals', x: 0, y: 0, vx: 0, vy: 0, dragging: false }
-    ];
+    const CAMERA_PATH =
+        'M9 3 7.2 5H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.2L15 3H9Zm3 5a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z';
 
-    let nodes = [];
+    let icons = $state([
+        { id: 'ts', path: siTypescript.path, color: `#${siTypescript.hex}`, label: 'TypeScript' },
+        { id: 'svelte', path: siSvelte.path, color: `#${siSvelte.hex}`, label: 'Svelte' },
+        { id: 'swift', path: siSwift.path, color: `#${siSwift.hex}`, label: 'Swift & SwiftUI' },
+        { id: 'python', path: siPython.path, color: `#${siPython.hex}`, label: 'Python' },
+        { id: 'photo', path: CAMERA_PATH, color: 'var(--accent-color)', label: 'Photography' }
+    ].map((icon) => ({ ...icon, x: 0, y: 0, vx: 0, vy: 0, dragging: false })));
+
+    let nodes = $state([]);
+    let bar;
     let dragTarget = null;
+    let dragMoved = false;
     let lastX = 0;
     let lastY = 0;
+    let frame = 0;
 
-    // The Physics Loop
-    onMount(() => {
-        let frame;
-        const loop = () => {
-            let needsUpdate = false;
+    // Icons bounce off the hero section's edges rather than the viewport,
+    // so scrolling mid-throw doesn't make them jump.
+    function bounds() {
+        const hero = bar?.closest('[data-skill-bounds], .hero-container');
+        const r = hero?.getBoundingClientRect();
+        return r ?? { left: 0, top: 0, right: window.innerWidth, bottom: window.innerHeight };
+    }
 
-            icons.forEach((icon, i) => {
-                const node = nodes[i];
-                if (!node || icon.dragging) return;
+    function step() {
+        let moving = false;
+        const b = bounds();
 
-                // Only apply physics if there is kinetic energy
-                if (Math.abs(icon.vx) > 0.1 || Math.abs(icon.vy) > 0.1) {
-                    icon.x += icon.vx;
-                    icon.y += icon.vy;
-                    
-                    // Friction (slows them down over time)
-                    icon.vx *= 0.95;
-                    icon.vy *= 0.95;
+        icons.forEach((icon, i) => {
+            const node = nodes[i];
+            if (!node || icon.dragging) return;
+            if (Math.abs(icon.vx) < 0.1 && Math.abs(icon.vy) < 0.1) return;
 
-                    // Boundary Bouncing
-                    const rect = node.getBoundingClientRect();
-                    
-                    // Left & Right walls
-                    if (rect.left < 0) { 
-                        icon.x -= rect.left; 
-                        icon.vx *= -0.8; // Reverse direction and lose 20% energy
-                    } else if (rect.right > window.innerWidth) { 
-                        icon.x -= (rect.right - window.innerWidth); 
-                        icon.vx *= -0.8; 
-                    }
-                    
-                    // Top & Bottom walls
-                    if (rect.top < 0) { 
-                        icon.y -= rect.top; 
-                        icon.vy *= -0.8; 
-                    } else if (rect.bottom > window.innerHeight) { 
-                        icon.y -= (rect.bottom - window.innerHeight); 
-                        icon.vy *= -0.8; 
-                    }
-                    needsUpdate = true;
-                }
-            });
+            icon.x += icon.vx;
+            icon.y += icon.vy;
+            icon.vx *= 0.95; // friction
+            icon.vy *= 0.95;
 
-            if (needsUpdate) icons = icons; // Trigger Svelte reactivity
-            frame = requestAnimationFrame(loop);
-        };
-        
-        frame = requestAnimationFrame(loop);
-        return () => cancelAnimationFrame(frame);
-    });
+            const rect = node.getBoundingClientRect();
+            if (rect.left < b.left) { icon.x += b.left - rect.left; icon.vx *= -0.8; }
+            else if (rect.right > b.right) { icon.x -= rect.right - b.right; icon.vx *= -0.8; }
+            if (rect.top < b.top) { icon.y += b.top - rect.top; icon.vy *= -0.8; }
+            else if (rect.bottom > b.bottom) { icon.y -= rect.bottom - b.bottom; icon.vy *= -0.8; }
 
-    // Pointer Events for Dragging
+            moving = true;
+        });
+
+        // Only keep the loop alive while something is actually coasting
+        frame = moving ? requestAnimationFrame(step) : 0;
+    }
+
+    function kick() {
+        if (!frame) frame = requestAnimationFrame(step);
+    }
+
+    onMount(() => () => cancelAnimationFrame(frame));
+
     function pointerDown(e, index) {
         dragTarget = index;
-        icons[index].dragging = true;
-        icons[index].vx = 0;
-        icons[index].vy = 0;
+        dragMoved = false;
+        const icon = icons[index];
+        icon.dragging = true;
+        icon.vx = 0;
+        icon.vy = 0;
         lastX = e.clientX;
         lastY = e.clientY;
-        
-        // Boost z-index while dragging
-        nodes[index].style.zIndex = '1000';
     }
 
     function pointerMove(e) {
         if (dragTarget === null) return;
-        
         const icon = icons[dragTarget];
         const dx = e.clientX - lastX;
         const dy = e.clientY - lastY;
-        
+        if (Math.abs(dx) + Math.abs(dy) > 0) dragMoved = true;
+
         icon.x += dx;
         icon.y += dy;
-        
-        // Store velocity based on how fast the mouse is moving
+        // Remember throw velocity from the last pointer movement
         icon.vx = dx * 0.8;
         icon.vy = dy * 0.8;
-        
         lastX = e.clientX;
         lastY = e.clientY;
-        icons = icons;
     }
 
     function pointerUp() {
         if (dragTarget === null) return;
-        
         icons[dragTarget].dragging = false;
-        nodes[dragTarget].style.zIndex = '1';
         dragTarget = null;
-        icons = icons;
+        kick();
+    }
+
+    // Keyboard fun: arrow keys give the focused icon a shove; Home resets it
+    const NUDGE = { ArrowLeft: [-12, 0], ArrowRight: [12, 0], ArrowUp: [0, -12], ArrowDown: [0, 12] };
+    function keyDown(e, index) {
+        const icon = icons[index];
+        if (e.key === 'Home') {
+            icon.x = icon.y = icon.vx = icon.vy = 0;
+            e.preventDefault();
+            return;
+        }
+        const n = NUDGE[e.key];
+        if (!n) return;
+        e.preventDefault();
+        icon.vx += n[0];
+        icon.vy += n[1];
+        kick();
     }
 </script>
 
-<svelte:window on:pointermove={pointerMove} on:pointerup={pointerUp} />
+<svelte:window onpointermove={pointerMove} onpointerup={pointerUp} onpointercancel={pointerUp} />
 
-<div class="skills-bar">
-    {#each icons as icon, i}
-        <!-- 
-          The outer wrapper handles the physics positioning.
-          This prevents our movement transform from overriding your hover scale effect in CSS.
-        -->
-        <div 
+<ul class="skills-bar" bind:this={bar} aria-label="Skills">
+    {#each icons as icon, i (icon.id)}
+        <li
             bind:this={nodes[i]}
             class="physics-wrapper"
-            style="transform: translate3d({icon.x}px, {icon.y}px, 0);"
-            on:pointerdown={(e) => pointerDown(e, i)}
+            class:is-dragging={icon.dragging}
+            style:transform="translate3d({icon.x}px, {icon.y}px, 0)"
         >
-            <div 
-                class="skill-icon-wrapper {icon.dragging ? 'is-dragging' : ''}" 
-                data-tooltip={icon.tooltip}
+            <button
+                class="skill-icon-wrapper"
+                data-tooltip={icon.label}
+                aria-label="{icon.label} (drag or use arrow keys to throw)"
+                onpointerdown={(e) => pointerDown(e, i)}
+                onkeydown={(e) => keyDown(e, i)}
+                onclick={(e) => dragMoved && e.preventDefault()}
             >
-                <i class="{icon.class} skill-icon {icon.colorClass}"></i>
-            </div>
-        </div>
+                <svg viewBox="0 0 24 24" aria-hidden="true" style:fill={icon.color}>
+                    <path d={icon.path} />
+                </svg>
+            </button>
+        </li>
     {/each}
-</div>
+</ul>
 
 <style>
-    .physics-wrapper {
-        /* Prevents the browser from trying to scroll the page when dragging on mobile */
-        touch-action: none; 
-        cursor: grab;
-        position: relative;
-        z-index: 1;
+    .skills-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.25rem;
+        margin-bottom: 3rem;
+        list-style: none;
     }
 
-    .physics-wrapper:active {
+    .physics-wrapper {
+        position: relative;
+        z-index: 1;
+        /* Stops the page scrolling when dragging on touch screens */
+        touch-action: none;
+    }
+
+    .physics-wrapper.is-dragging {
+        z-index: 1000;
+    }
+
+    .skill-icon-wrapper {
+        position: relative;
+        width: 60px;
+        height: 60px;
+        border: 1px solid var(--border-subtle);
+        border-radius: 50%;
+        background: var(--card-bg);
+        box-shadow: var(--shadow-soft);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: grab;
+        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+    }
+
+    .is-dragging .skill-icon-wrapper {
         cursor: grabbing;
     }
 
-    /* Hide the tooltip while the user is actively throwing the icon */
-    .is-dragging::after {
-        display: none !important;
+    .skill-icon-wrapper svg {
+        width: 28px;
+        height: 28px;
+    }
+
+    .skill-icon-wrapper:hover,
+    .skill-icon-wrapper:focus-visible {
+        transform: scale(1.15) rotate(5deg);
+        box-shadow: 0 15px 35px var(--accent-glow);
+    }
+
+    /* Tooltip */
+    .skill-icon-wrapper::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: -40px;
+        left: 50%;
+        transform: translateX(-50%) scale(0);
+        background-color: var(--text-base);
+        color: var(--bg-base);
+        padding: 0.5rem 1rem;
+        border-radius: 15px;
+        font: 500 0.85rem 'Rubik', sans-serif;
+        white-space: nowrap;
+        opacity: 0;
+        transition: all 0.3s ease;
+        pointer-events: none;
+    }
+
+    .skill-icon-wrapper:hover::after,
+    .skill-icon-wrapper:focus-visible::after {
+        transform: translateX(-50%) scale(1);
+        opacity: 1;
+        bottom: -50px;
+    }
+
+    /* Hide the tooltip while the icon is being thrown around */
+    .is-dragging .skill-icon-wrapper::after {
+        display: none;
+    }
+
+    @media (max-width: 900px) {
+        .skills-bar {
+            justify-content: center;
+        }
     }
 </style>

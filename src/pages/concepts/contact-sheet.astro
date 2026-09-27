@@ -1,0 +1,301 @@
+---
+import Concept from '../../layouts/Concept.astro';
+import DepthProfile from '../../components/DepthProfile.svelte';
+import DraggableSkills from '../../components/DraggableSkills.svelte';
+import ContactSheet from '../../components/concepts/ContactSheet.svelte';
+import { loadPhotos, CAMERA, LENS } from '../../lib/photos';
+import { loadPortrait } from '../../lib/portrait';
+
+const photos = await loadPhotos(240);
+const portrait = await loadPortrait();
+
+const rolls = [
+  {
+    no: '02',
+    title: 'Tree of Life',
+    note: 'convergent evolution, drawn radially. click "venom"!',
+    stack: 'SVELTE · CANVAS 2D · PYTHON',
+    href: '/tree-of-life',
+    cta: 'view roll →',
+  },
+  {
+    no: '03',
+    title: 'Local RAG Assistant',
+    note: 'chat w/ my texts — 100% offline, nothing leaves the device',
+    stack: 'SWIFTUI · OLLAMA · VECTOR DB',
+    cta: 'private — ask me',
+  },
+  {
+    no: '04',
+    title: 'jasonwride.studio',
+    note: 'this site. yes the portrait moves.',
+    stack: 'ASTRO · SVELTE · WEBGL',
+    href: 'https://github.com/twitterspree/jasonwride-studio',
+    cta: 'source →',
+  },
+];
+
+const edge = 'JW 400 ▸ SAFETY FILM ▸ ROLL 01 ▸ JASON WRIDE ▸ UNIV. OF UTAH ▸ ';
+---
+
+<Concept
+  title="Contact Sheet"
+  current="contact-sheet"
+  fonts="family=Big+Shoulders+Display:wght@700;900&family=Space+Mono:wght@400;700&family=Permanent+Marker"
+>
+  <div class="edge-marquee" aria-hidden="true">
+    <div class="edge-track"><span>{edge.repeat(6)}</span><span>{edge.repeat(6)}</span></div>
+  </div>
+
+  <main class="darkroom">
+    <header class="leader" data-skill-bounds>
+      <div class="leader-text">
+        <p class="mono red-light">● Safelight on</p>
+        <h1 class="name">Jason<br />Wride</h1>
+        <p class="lede">
+          Information systems student at the University of Utah. I shoot people in golden light and write software
+          that does odd, delightful things.
+        </p>
+        <p class="grease-note">loaded:</p>
+        <DraggableSkills client:visible />
+      </div>
+
+      <div class="lightbox-table">
+        <div class="slide">
+          <div class="slide-window">
+            <DepthProfile client:load {...portrait} alt="Portrait of Jason Wride" />
+          </div>
+          <span class="slide-label">J.W. — self<br />fig. 00</span>
+        </div>
+        <p class="mono dim">↖ hover the slide</p>
+      </div>
+    </header>
+
+    <section class="section" aria-labelledby="sheet-title">
+      <div class="section-head">
+        <h2 id="sheet-title" class="section-title">Roll 01 <span>— the sheet</span></h2>
+        <p class="grease-note">hover to develop · click to circle your faves</p>
+      </div>
+      <ContactSheet client:visible {photos} />
+      <p class="mono dim sheet-caption">{CAMERA} · {LENS} · shot wide open, mostly at golden hour</p>
+    </section>
+
+    <section class="section" aria-labelledby="rolls-title">
+      <h2 id="rolls-title" class="section-title">Other rolls <span>— code</span></h2>
+      <div class="rolls">
+        {rolls.map((r) => (
+          <article class="roll">
+            <div class="canister" aria-hidden="true">
+              <span class="cap"></span>
+              <span class="body">{r.no}</span>
+              <span class="tongue"></span>
+            </div>
+            <div class="roll-text">
+              <p class="mono dim">ROLL {r.no}</p>
+              <h3>{r.title}</h3>
+              <p class="roll-note">{r.note}</p>
+              <p class="mono stack">{r.stack}</p>
+              {r.href ? <a class="roll-cta" href={r.href}>{r.cta}</a> : <span class="roll-cta muted">{r.cta}</span>}
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <footer class="section outro">
+      <p class="mono dim">Sheet 1 of 1 · print what's circled</p>
+      <a class="big-mail" href="mailto:jason.wride@utah.edu">say hi →</a>
+    </footer>
+  </main>
+</Concept>
+
+<style is:global>
+  :root {
+    --bg: #0d0d0c;
+    --fg: #ece8df;
+    --dim: #8a857b;
+    --grease: #ff3b2f;
+    --rebate: #e8a33d;
+    /* tokens used by shared components */
+    --bg-base: var(--bg);
+    --text-base: var(--fg);
+    --card-bg: #1b1a18;
+    --border-subtle: rgba(255, 255, 255, 0.12);
+    --shadow-soft: 0 8px 20px rgba(0, 0, 0, 0.5);
+    --accent-color: var(--grease);
+    --accent-glow: rgba(255, 59, 47, 0.35);
+  }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Space Mono', monospace;
+    /* safelight vignette */
+    background-image: radial-gradient(ellipse at 80% -10%, rgba(255, 40, 20, 0.12), transparent 50%);
+    background-attachment: fixed;
+  }
+  a { color: inherit; }
+</style>
+
+<style>
+  .edge-marquee {
+    overflow: hidden;
+    background: #1a1612;
+    color: var(--rebate);
+    font: 700 0.7rem/2 'Space Mono', monospace;
+    letter-spacing: 0.15em;
+    white-space: nowrap;
+    border-bottom: 1px solid #2a241c;
+  }
+  .edge-track { display: inline-flex; animation: edge 60s linear infinite; }
+  @keyframes edge { to { transform: translateX(-50%); } }
+
+  .darkroom { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem 8rem; }
+
+  .mono { font-family: 'Space Mono', monospace; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; }
+  .dim { color: var(--dim); }
+  .red-light { color: var(--grease); animation: flicker 4s infinite; }
+  @keyframes flicker { 0%, 92%, 100% { opacity: 1; } 94% { opacity: 0.3; } 96% { opacity: 0.9; } }
+
+  .grease-note {
+    font-family: 'Permanent Marker', cursive;
+    color: var(--grease);
+    font-size: 1.3rem;
+    transform: rotate(-2deg);
+    margin: 1.5rem 0 0.6rem;
+  }
+
+  /* ---------- Leader ---------- */
+  .leader {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 3rem;
+    align-items: center;
+    padding: 4rem 0 5rem;
+  }
+  .name {
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-weight: 900;
+    font-size: clamp(5rem, 16vw, 12rem);
+    line-height: 0.82;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    margin: 1rem 0 1.5rem;
+    /* the letters glow like they're on the light table */
+    text-shadow: 0 0 40px rgba(255, 59, 47, 0.15);
+  }
+  .lede { font-size: 0.95rem; line-height: 1.7; max-width: 46ch; color: #c9c4b8; }
+
+  /* Light table + slide mount */
+  .lightbox-table {
+    background: radial-gradient(circle at 50% 40%, #fffdf6, #e9e4d6 70%);
+    padding: 3rem 2rem 1.5rem;
+    border-radius: 6px;
+    box-shadow: 0 0 80px rgba(255, 250, 230, 0.18), inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    animation: lamp 1.2s steps(1) 0.3s both;
+  }
+  @keyframes lamp { 0% { filter: brightness(0.2); } 20% { filter: brightness(1); } 30% { filter: brightness(0.4); } 45% { filter: brightness(1); } }
+  .lightbox-table .dim { color: #8f887a; margin-top: 1rem; }
+
+  .slide {
+    position: relative;
+    display: inline-block;
+    background: #fafafa;
+    padding: 26px 26px 48px;
+    border-radius: 6px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+    transform: rotate(-3deg);
+    transition: transform 0.3s cubic-bezier(0.3, 1.6, 0.5, 1);
+  }
+  .slide:hover { transform: rotate(0deg) scale(1.03); }
+  .slide-window { width: min(320px, 60vw); height: min(300px, 56vw); background: #000; }
+  .slide-window :global(.depth-container) { border-radius: 0; }
+  .slide-label {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 8px;
+    font-family: 'Permanent Marker', cursive;
+    font-size: 0.85rem;
+    line-height: 1.1;
+    color: #2b2b2b;
+  }
+
+  /* ---------- Sections ---------- */
+  .section { padding: 4rem 0; border-top: 1px dashed #2e2b26; }
+  .section-head { display: flex; justify-content: space-between; align-items: end; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+  .section-head .grease-note { margin: 0; }
+  .section-title {
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-weight: 900;
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    text-transform: uppercase;
+    line-height: 1;
+    margin-bottom: 1.5rem;
+  }
+  .section-head .section-title { margin: 0; }
+  .section-title span { font-weight: 700; color: var(--dim); }
+  .sheet-caption { margin-top: 1.5rem; text-align: right; }
+
+  /* ---------- Rolls ---------- */
+  .rolls { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+  .roll { display: flex; gap: 1.2rem; align-items: flex-start; }
+  .canister {
+    position: relative;
+    flex: none;
+    width: 64px;
+    height: 96px;
+    transition: transform 0.4s cubic-bezier(0.3, 1.7, 0.5, 1);
+  }
+  .roll:hover .canister { transform: rotate(-12deg) translateY(-6px); }
+  .canister .cap { position: absolute; top: 0; left: 6px; right: 6px; height: 10px; background: #3a3a3a; border-radius: 3px 3px 0 0; }
+  .canister .body {
+    position: absolute;
+    top: 8px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, #b8b2a6, #f2ede3 45%, #a39d91);
+    border-radius: 4px;
+    display: grid;
+    place-items: center;
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-weight: 900;
+    font-size: 1.8rem;
+    color: #1a1a1a;
+  }
+  .canister .tongue {
+    position: absolute;
+    top: 40px;
+    right: -26px;
+    width: 30px;
+    height: 34px;
+    background: #2b1d10;
+    border-radius: 0 6px 6px 0;
+    transition: width 0.4s ease;
+  }
+  .roll:hover .tongue { width: 54px; }
+  .roll-text h3 { font-family: 'Big Shoulders Display', sans-serif; font-weight: 900; font-size: 2rem; text-transform: uppercase; line-height: 1; margin: 0.3rem 0 0.4rem; }
+  .roll-note { font-family: 'Permanent Marker', cursive; color: var(--grease); font-size: 1.05rem; line-height: 1.3; }
+  .stack { margin-top: 0.6rem; color: var(--rebate); }
+  .roll-cta { display: inline-block; margin-top: 0.8rem; font-size: 0.85rem; text-decoration: underline; text-decoration-color: var(--grease); text-underline-offset: 4px; }
+  .roll-cta.muted { text-decoration: none; color: var(--dim); }
+
+  .outro { text-align: center; }
+  .big-mail {
+    display: inline-block;
+    margin-top: 1rem;
+    font-family: 'Permanent Marker', cursive;
+    font-size: clamp(2.5rem, 8vw, 5rem);
+    color: var(--grease);
+    text-decoration: none;
+    transform: rotate(-3deg);
+    transition: transform 0.3s cubic-bezier(0.3, 1.7, 0.5, 1);
+  }
+  .big-mail:hover { transform: rotate(2deg) scale(1.06); }
+
+  @media (max-width: 860px) {
+    .leader { grid-template-columns: 1fr; padding-top: 2rem; }
+    .lightbox-table { order: -1; }
+  }
+</style>
