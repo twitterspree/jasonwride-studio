@@ -1,0 +1,475 @@
+---
+import Concept from '../../layouts/Concept.astro';
+import DepthProfile from '../../components/DepthProfile.svelte';
+import DraggableSkills from '../../components/DraggableSkills.svelte';
+import { loadPhotos, CAMERA, LENS } from '../../lib/photos';
+import { loadPortrait } from '../../lib/portrait';
+import { contours } from '../../lib/topo';
+
+const photos = await loadPhotos(420);
+const portrait = await loadPortrait();
+const topo = contours();
+const fmt = (d?: string) =>
+  d ? new Date(d + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+
+const camps = [
+  {
+    name: 'Tree of Life Camp',
+    blurb: 'An interactive radial tree of convergent evolution. Pick a trait and watch unrelated lineages light up.',
+    gear: 'Svelte · Canvas 2D · Python',
+    href: '/tree-of-life',
+    cta: 'Hike over →',
+  },
+  {
+    name: 'Local RAG Hut',
+    blurb: 'A macOS/iOS app that runs a local LLM over my iMessage history. No signal needed — it’s fully offline.',
+    gear: 'SwiftUI · Ollama · Vector DB',
+    cta: 'Private trail',
+  },
+  {
+    name: 'Studio Basecamp',
+    blurb: 'This website. Rebuilt more times than a trail after a rockslide.',
+    gear: 'Astro · Svelte · WebGL',
+    href: 'https://github.com/twitterspree/jasonwride-studio',
+    cta: 'View source →',
+  },
+];
+---
+
+<Concept title="Trailhead" current="trailhead" fonts="family=Zilla+Slab:wght@500;700&family=Overpass:wght@400;600;800&family=Overpass+Mono:wght@400;600">
+  <svg class="topo" viewBox={`0 0 ${topo.width} ${topo.height}`} preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    {topo.paths.map((p) => <path d={p.d} class:list={['contour', p.index && 'index']} />)}
+    {topo.peaks.map((pk) => <text x={pk.x} y={pk.y} class="peak">▲</text>)}
+  </svg>
+
+  <aside class="hud" aria-label="Trail progress">
+    <div class="compass" aria-hidden="true">
+      <span class="needle"></span>
+      <span class="n">N</span>
+    </div>
+    <div class="hud-text">
+      <p class="mono">PORTFOLIO LOOP</p>
+      <p class="progress"><b data-progress>0%</b> to summit</p>
+      <div class="bar"><span data-bar></span></div>
+    </div>
+  </aside>
+
+  <main class="trail-wrap" data-trail>
+    <svg class="trail" aria-hidden="true">
+      <path class="trail-ghost" data-ghost />
+      <path class="trail-path" data-path />
+      <g data-hiker class="hiker"><circle r="11" /><text y="4" text-anchor="middle">🥾</text></g>
+    </svg>
+
+    <!-- Trailhead sign -->
+    <header class="waypoint sign-post" data-skill-bounds>
+      <span class="pin" data-pin></span>
+      <div class="sign">
+        <p class="sign-small">TRAILHEAD · EL. YOU ARE HERE</p>
+        <h1 class="sign-name">Jason Wride</h1>
+        <p class="sign-small">40.76°N 111.84°W · UNIVERSITY OF UTAH</p>
+      </div>
+      <nav class="arrows" aria-label="Trail sections">
+        <a href="#viewpoints" class="arrow right">Viewpoints <span>→</span></a>
+        <a href="#camps" class="arrow left"><span>←</span> Campsites</a>
+        <a href="#summit" class="arrow right up">Summit <span>↗</span></a>
+      </nav>
+    </header>
+
+    <!-- Info board -->
+    <section class="waypoint board-wrap left">
+      <span class="pin" data-pin></span>
+      <div class="board">
+        <div class="board-photo"><DepthProfile client:load {...portrait} alt="Portrait of Jason Wride" /></div>
+        <div class="board-text">
+          <h2>Trail info</h2>
+          <p>
+            Information Systems student at the University of Utah. Photographer. Builds software that does fun things.
+            This loop passes {photos.length} viewpoints and {camps.length} campsites before the summit.
+          </p>
+          <p class="mono">PACK LIST — throw these around:</p>
+          <DraggableSkills client:visible />
+        </div>
+      </div>
+    </section>
+
+    <!-- Viewpoints -->
+    <h2 id="viewpoints" class="leg-title">Leg 1 — Viewpoints</h2>
+    {photos.map((p, i) => (
+      <figure class:list={['waypoint', 'viewpoint', i % 2 ? 'right' : 'left', p.portrait && 'tall']}>
+        <span class="pin" data-pin></span>
+        <div class="vp-card">
+          <img src={p.full} alt={p.alt} loading="lazy" decoding="async" />
+          <figcaption>
+            <span class="vp-no">VP {i + 1}</span>
+            <span>{p.alt}</span>
+            <span class="mono">{fmt(p.date)} · {p.exif}</span>
+          </figcaption>
+        </div>
+      </figure>
+    ))}
+
+    <!-- Campsites -->
+    <h2 id="camps" class="leg-title">Leg 2 — Campsites</h2>
+    {camps.map((c, i) => (
+      <section class:list={['waypoint', 'camp', i % 2 ? 'left' : 'right']}>
+        <span class="pin" data-pin></span>
+        <div class="camp-card">
+          <span class="tent" aria-hidden="true">⛺</span>
+          <h3>{c.name}</h3>
+          <p>{c.blurb}</p>
+          <p class="mono gear">{c.gear}</p>
+          {c.href ? <a href={c.href}>{c.cta}</a> : <span class="muted">{c.cta}</span>}
+        </div>
+      </section>
+    ))}
+
+    <!-- Summit -->
+    <section id="summit" class="waypoint summit">
+      <span class="pin" data-pin></span>
+      <button class="flag" type="button" data-flag aria-label="Plant the summit flag">
+        <span class="pole"></span>
+        <span class="cloth">JW</span>
+      </button>
+      <h2>You made it to the summit.</h2>
+      <p class="register" data-register>Click the flag to sign the summit register.</p>
+      <a class="mail" href="mailto:jason.wride@utah.edu">jason.wride@utah.edu</a>
+      <p class="mono">Photos: {CAMERA} + {LENS}</p>
+    </section>
+  </main>
+</Concept>
+
+<script>
+  const wrap = document.querySelector<HTMLElement>('[data-trail]')!;
+  const svg = wrap.querySelector<SVGSVGElement>('svg.trail')!;
+  const path = wrap.querySelector<SVGPathElement>('[data-path]')!;
+  const ghost = wrap.querySelector<SVGPathElement>('[data-ghost]')!;
+  const hiker = wrap.querySelector<SVGGElement>('[data-hiker]')!;
+  const pctEl = document.querySelector<HTMLElement>('[data-progress]')!;
+  const barEl = document.querySelector<HTMLElement>('[data-bar]')!;
+  let length = 0;
+
+  // Smooth Catmull-Rom curve through every waypoint pin
+  function buildTrail() {
+    const box = wrap.getBoundingClientRect();
+    svg.setAttribute('width', String(box.width));
+    svg.setAttribute('height', String(wrap.scrollHeight));
+    const pts = [...wrap.querySelectorAll<HTMLElement>('[data-pin]')].map((pin) => {
+      const r = pin.getBoundingClientRect();
+      return [r.left + r.width / 2 - box.left, r.top + r.height / 2 - box.top];
+    });
+    if (pts.length < 2) return;
+    let d = `M${pts[0][0]} ${pts[0][1]}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[i - 1] ?? pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] ?? p2;
+      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+      d += ` C${c1[0]} ${c1[1]} ${c2[0]} ${c2[1]} ${p2[0]} ${p2[1]}`;
+    }
+    path.setAttribute('d', d);
+    ghost.setAttribute('d', d);
+    length = path.getTotalLength();
+    path.style.strokeDasharray = `${length}`;
+    update();
+  }
+
+  // Draw the trail up to where the reader has scrolled
+  function update() {
+    if (!length) return;
+    const box = wrap.getBoundingClientRect();
+    const reach = window.innerHeight * 0.6 - box.top; // trail tip sits 60% down the viewport
+    // Find the point on the path at that page depth (binary search on length)
+    let lo = 0, hi = length;
+    for (let k = 0; k < 18; k++) {
+      const mid = (lo + hi) / 2;
+      if (path.getPointAtLength(mid).y < reach) lo = mid; else hi = mid;
+    }
+    const at = Math.min(length, lo);
+    path.style.strokeDashoffset = String(length - at);
+    const pt = path.getPointAtLength(at);
+    hiker.setAttribute('transform', `translate(${pt.x} ${pt.y})`);
+    const pct = Math.round((at / length) * 100);
+    pctEl.textContent = `${pct}%`;
+    barEl.style.width = `${pct}%`;
+    document.body.classList.toggle('summited', pct >= 99);
+  }
+
+  window.addEventListener('scroll', update, { passive: true });
+  new ResizeObserver(buildTrail).observe(wrap);
+  document.fonts?.ready.then(buildTrail);
+  window.addEventListener('load', buildTrail);
+
+  // Compass needle points at the cursor
+  const needle = document.querySelector<HTMLElement>('.needle')!;
+  const compass = document.querySelector<HTMLElement>('.compass')!;
+  window.addEventListener('pointermove', (e) => {
+    const r = compass.getBoundingClientRect();
+    const a = Math.atan2(e.clientY - (r.top + r.height / 2), e.clientX - (r.left + r.width / 2));
+    needle.style.transform = `rotate(${(a * 180) / Math.PI + 90}deg)`;
+  });
+
+  // Summit flag: plant it, sign the register
+  const flag = document.querySelector<HTMLButtonElement>('[data-flag]')!;
+  const register = document.querySelector<HTMLElement>('[data-register]')!;
+  let signed = 0;
+  flag.addEventListener('click', () => {
+    flag.classList.remove('planted');
+    void flag.offsetWidth;
+    flag.classList.add('planted');
+    signed++;
+    const time = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    register.textContent =
+      signed === 1 ? `Signed the register at ${time}. Nice hike!` : `Signed ${signed} times. You really like summits.`;
+  });
+</script>
+
+<style is:global>
+  :root {
+    --map: #ece6d3;
+    --contour: #b89868;
+    --trail: #d0412b;
+    --forest: #2f5d3a;
+    --wood: #6b4428;
+    --wood-light: #8a5a36;
+    --cream: #f7efd9;
+    --ink: #2a241c;
+    --bg-base: var(--map);
+    --text-base: var(--ink);
+    --card-bg: var(--cream);
+    --border-subtle: rgba(107, 68, 40, 0.3);
+    --shadow-soft: 0 3px 0 var(--wood);
+    --accent-color: var(--trail);
+    --accent-glow: rgba(208, 65, 43, 0.3);
+  }
+  body {
+    background: var(--map);
+    color: var(--ink);
+    font-family: 'Overpass', system-ui, sans-serif;
+    overflow-x: hidden;
+  }
+  a { color: var(--trail); }
+</style>
+
+<style>
+  .topo {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .contour { fill: none; stroke: var(--contour); stroke-width: 0.7; opacity: 0.55; }
+  .contour.index { stroke-width: 1.4; opacity: 0.75; }
+  .peak { fill: #8a6a3d; font-size: 14px; opacity: 0.6; }
+
+  .mono { font-family: 'Overpass Mono', monospace; font-size: 0.72rem; letter-spacing: 0.06em; }
+
+  /* ---------- HUD ---------- */
+  .hud {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    background: rgba(247, 239, 217, 0.92);
+    border: 2px solid var(--wood);
+    border-radius: 12px;
+    padding: 0.6rem 0.9rem;
+    box-shadow: 0 6px 18px rgba(60, 40, 20, 0.2);
+  }
+  .compass {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid var(--wood);
+    background: radial-gradient(circle, #fffaf0, #e9dfc4);
+  }
+  .needle {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 6px;
+    height: 36px;
+    margin: -18px 0 0 -3px;
+    background: linear-gradient(var(--trail) 50%, var(--ink) 50%);
+    clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+    transition: transform 0.25s cubic-bezier(0.3, 1.6, 0.5, 1);
+  }
+  .compass .n { position: absolute; top: -2px; left: 50%; transform: translateX(-50%); font: 800 0.6rem 'Overpass', sans-serif; }
+  .progress { font-size: 0.85rem; }
+  .progress b { font-family: 'Zilla Slab', serif; font-size: 1.3rem; color: var(--trail); }
+  .bar { width: 130px; height: 6px; border-radius: 3px; background: rgba(107, 68, 40, 0.2); overflow: hidden; margin-top: 3px; }
+  .bar span { display: block; height: 100%; width: 0; background: var(--trail); }
+
+  /* ---------- Trail ---------- */
+  .trail-wrap { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 4rem 1.25rem 10rem; }
+  .trail { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; z-index: 0; }
+  .trail-ghost { fill: none; stroke: var(--trail); stroke-width: 3; stroke-dasharray: 2 9; stroke-linecap: round; opacity: 0.35; }
+  .trail-path { fill: none; stroke: var(--trail); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+  .hiker circle { fill: var(--cream); stroke: var(--trail); stroke-width: 3; }
+  .hiker text { font-size: 12px; }
+
+  .waypoint { position: relative; z-index: 1; margin: 0 0 7rem; }
+  .pin {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--cream);
+    border: 4px solid var(--forest);
+    z-index: 2;
+  }
+  .left .pin { right: -9px; top: 50%; }
+  .right .pin { left: -9px; top: 50%; }
+  .left { margin-right: 28%; }
+  .right { margin-left: 28%; }
+
+  /* Trailhead sign */
+  .sign-post { text-align: center; padding-top: 1rem; }
+  .sign-post .pin { left: 50%; bottom: -3rem; margin-left: -9px; }
+  .sign {
+    display: inline-block;
+    background:
+      repeating-linear-gradient(0deg, transparent 0 18px, rgba(0, 0, 0, 0.08) 18px 20px),
+      linear-gradient(var(--wood-light), var(--wood));
+    color: var(--cream);
+    padding: 1.4rem 2.5rem 1.2rem;
+    border-radius: 8px;
+    box-shadow: inset 0 0 0 3px rgba(0, 0, 0, 0.25), 0 12px 24px rgba(60, 40, 20, 0.35);
+  }
+  .sign-small { font: 600 0.72rem 'Overpass Mono', monospace; letter-spacing: 0.14em; opacity: 0.85; }
+  .sign-name {
+    font-family: 'Zilla Slab', serif;
+    font-weight: 700;
+    font-size: clamp(3rem, 10vw, 6.5rem);
+    line-height: 1;
+    margin: 0.4rem 0;
+    /* routed-into-wood look */
+    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.45), 0 -1px 0 rgba(255, 255, 255, 0.15);
+  }
+  .arrows { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; margin-top: 1rem; }
+  .arrow {
+    display: inline-flex;
+    gap: 0.5rem;
+    align-items: center;
+    font: 700 1rem 'Zilla Slab', serif;
+    color: var(--cream);
+    text-decoration: none;
+    background: var(--forest);
+    padding: 0.4rem 1.2rem;
+    transform-origin: 50% -40px;
+    transition: transform 0.4s cubic-bezier(0.3, 1.9, 0.5, 1);
+  }
+  .arrow.right { clip-path: polygon(0 0, 88% 0, 100% 50%, 88% 100%, 0 100%); padding-right: 1.8rem; transform: rotate(-3deg); }
+  .arrow.left { clip-path: polygon(12% 0, 100% 0, 100% 100%, 12% 100%, 0 50%); padding-left: 1.8rem; transform: rotate(2deg); }
+  .arrow:hover { transform: rotate(0deg) translateX(6px); }
+  .arrow.left:hover { transform: rotate(0deg) translateX(-6px); }
+
+  /* Info board */
+  .board {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 1.5rem;
+    background: var(--cream);
+    border: 10px solid var(--wood);
+    border-radius: 6px;
+    padding: 1.2rem;
+    box-shadow: 0 12px 30px rgba(60, 40, 20, 0.25);
+  }
+  .board-photo { height: 240px; }
+  .board-photo :global(.depth-container) { border-radius: 4px; }
+  .board h2 { font: 700 1.8rem 'Zilla Slab', serif; margin-bottom: 0.4rem; }
+  .board p { line-height: 1.5; margin-bottom: 0.8rem; }
+
+  .leg-title {
+    position: relative;
+    z-index: 1;
+    font: 700 clamp(1.8rem, 5vw, 3rem) 'Zilla Slab', serif;
+    color: var(--forest);
+    text-align: center;
+    margin: 0 0 3rem;
+    background: var(--map);
+    display: table;
+    padding: 0 1rem;
+    margin-inline: auto;
+  }
+
+  /* Viewpoints */
+  .vp-card {
+    background: var(--cream);
+    padding: 10px 10px 12px;
+    box-shadow: 0 10px 26px rgba(60, 40, 20, 0.25);
+    transform: rotate(var(--r, -1deg));
+    transition: transform 0.35s cubic-bezier(0.3, 1.6, 0.5, 1);
+  }
+  .right .vp-card { --r: 1.2deg; }
+  .vp-card:hover { transform: rotate(0) scale(1.02); }
+  .vp-card img { width: 100%; height: auto; }
+  .tall { max-width: 42%; }
+  .tall.right { margin-left: auto; }
+  .vp-card figcaption { display: flex; flex-direction: column; gap: 0.15rem; margin-top: 0.6rem; font-size: 0.92rem; }
+  .vp-no { font: 700 1.1rem 'Zilla Slab', serif; color: var(--trail); }
+
+  /* Camps */
+  .camp-card {
+    background: var(--cream);
+    border: 3px dashed var(--forest);
+    border-radius: 14px;
+    padding: 1.5rem 1.5rem 1.3rem;
+    box-shadow: 0 10px 24px rgba(60, 40, 20, 0.18);
+  }
+  .tent { font-size: 2rem; display: inline-block; transition: transform 0.4s cubic-bezier(0.3, 1.9, 0.5, 1); }
+  .camp-card:hover .tent { transform: translateY(-8px) rotate(-8deg); }
+  .camp-card h3 { font: 700 1.6rem 'Zilla Slab', serif; margin: 0.3rem 0; }
+  .camp-card p { line-height: 1.5; }
+  .gear { color: var(--forest); margin: 0.6rem 0; }
+  .muted { color: #8a7a60; font-weight: 600; }
+
+  /* Summit */
+  .summit { text-align: center; padding-top: 5rem; margin-bottom: 0; }
+  .summit .pin { left: 50%; top: 0; margin-left: -9px; border-color: var(--trail); }
+  .summit h2 { font: 700 clamp(2rem, 6vw, 3.6rem) 'Zilla Slab', serif; margin-top: 1rem; }
+  .register { margin: 0.5rem 0 1rem; color: var(--forest); font-weight: 600; min-height: 1.5em; }
+  .mail { display: inline-block; font: 700 clamp(1.3rem, 4vw, 2.2rem) 'Zilla Slab', serif; margin-bottom: 1rem; }
+  .flag {
+    position: relative;
+    width: 110px;
+    height: 150px;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+  .pole { position: absolute; left: 20px; bottom: 0; width: 5px; height: 150px; background: var(--wood); border-radius: 2px; }
+  .cloth {
+    position: absolute;
+    left: 25px;
+    top: 6px;
+    width: 76px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    background: var(--trail);
+    color: var(--cream);
+    font: 700 1.2rem 'Zilla Slab', serif;
+    transform-origin: 0 50%;
+    animation: wave 2.4s ease-in-out infinite;
+    clip-path: polygon(0 0, 100% 8%, 92% 50%, 100% 92%, 0 100%);
+  }
+  @keyframes wave { 0%, 100% { transform: skewY(0deg) scaleX(1); } 50% { transform: skewY(-5deg) scaleX(0.94); } }
+  .flag:global(.planted) { animation: plant 0.5s cubic-bezier(0.3, 1.8, 0.5, 1); }
+  @keyframes plant { 0% { transform: translateY(-60px); } 70% { transform: translateY(6px); } 100% { transform: none; } }
+  :global(body.summited) .cloth { background: var(--forest); }
+
+  @media (max-width: 760px) {
+    .left, .right { margin-left: 0; margin-right: 0; }
+    .left .pin, .right .pin { left: 50%; right: auto; top: -2.5rem; margin-left: -9px; }
+    .tall { max-width: 80%; margin-inline: auto; }
+    .board { grid-template-columns: 1fr; }
+    .hud { top: auto; bottom: 4.5rem; right: 0.5rem; padding: 0.4rem 0.6rem; }
+    .bar { width: 80px; }
+  }
+</style>

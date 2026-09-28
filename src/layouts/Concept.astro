@@ -3,7 +3,7 @@ interface Props {
   title: string;
   /** Google Fonts css2 query, e.g. "family=Fraunces:opsz,wght@9..144,300..900" */
   fonts: string;
-  current: 'book' | 'contact-sheet' | 'swiss';
+  current: 'book' | 'contact-sheet' | 'swiss' | 'field-notes' | 'trading-cards' | 'trailhead';
 }
 const { title, fonts, current } = Astro.props;
 
@@ -11,6 +11,9 @@ const concepts = [
   { id: 'book', label: 'The Book' },
   { id: 'contact-sheet', label: 'Contact Sheet' },
   { id: 'swiss', label: 'Swiss Index' },
+  { id: 'field-notes', label: 'Field Notes' },
+  { id: 'trading-cards', label: 'Trading Cards' },
+  { id: 'trailhead', label: 'Trailhead' },
 ] as const;
 ---
 

@@ -1,0 +1,185 @@
+---
+import Concept from '../../layouts/Concept.astro';
+import BoosterPack from '../../components/concepts/BoosterPack.svelte';
+import { loadPhotos } from '../../lib/photos';
+import { loadPortrait } from '../../lib/portrait';
+import meta from '../../data/photos.json';
+
+const photos = await loadPhotos(420);
+const portrait = await loadPortrait();
+
+type Meta = { aperture: number; shutter: string; iso: number; focal: number };
+const m = meta as Record<string, Meta>;
+
+// Card names, abilities and rarities for each photograph
+const photoCards: Record<string, { name: string; rarity: 'common' | 'rare' | 'holo'; ability: [string, string]; flavor: string }> = {
+  IMG_7799: { name: 'Eye Spy', rarity: 'rare', ability: ['Low-Light Legend', 'Shot at ISO 6400 and f/1.4 as the sun went down.'], flavor: 'Peekaboo, but make it golden hour.' },
+  'IMG_8004-2': { name: 'Golden Stroll', rarity: 'common', ability: ['Leading Lines', 'The path does the composing for you.'], flavor: 'Two walkers, one very yellow forest.' },
+  IMG_8504: { name: 'Riverside Rest', rarity: 'common', ability: ['White Water', 'Fast shutter freezes the stream behind them.'], flavor: 'Nature’s bench. Premium seating.' },
+  'IMG_8545-2': { name: 'Stream Gazers', rarity: 'common', ability: ['Over the Shoulder', 'Faces hidden, story told anyway.'], flavor: 'What are they looking at? (The stream.)' },
+  'IMG_8686-2': { name: 'The Whole Crew', rarity: 'holo', ability: ['Group Wrangler', 'Twelve people in one frame, all in the golden light.'], flavor: 'The rarest shot in any photographer’s deck.' },
+  IMG_8907: { name: 'Leaf Pile Pals', rarity: 'common', ability: ['Stack Attack', 'Two subjects, one pose, zero complaints.'], flavor: 'Autumn: extremely in season.' },
+  IMG_8934: { name: 'Airtime', rarity: 'rare', ability: ['Freeze Frame', 'A 1/2000s shutter catches them mid-air.'], flavor: 'Gravity: temporarily suspended.' },
+};
+
+const photoDeck = photos.map((p) => {
+  const c = photoCards[p.id];
+  const e = m[p.id];
+  return {
+    id: p.id,
+    name: c?.name ?? 'Untitled',
+    alt: p.alt,
+    type: 'Golden Hour',
+    typeIcon: '☀️',
+    rarity: c?.rarity ?? 'common',
+    corner: e ? `ISO ${e.iso}` : undefined,
+    img: p.thumb,
+    stats: e
+      ? [
+          { label: 'Aperture', value: `f/${e.aperture}` },
+          { label: 'Shutter', value: e.shutter },
+          { label: 'Focal', value: `${e.focal}mm` },
+        ]
+      : [],
+    ability: { name: c?.ability[0] ?? '', text: c?.ability[1] ?? '' },
+    flavor: c?.flavor,
+  };
+});
+
+const codeDeck = [
+  {
+    id: 'tree',
+    name: 'Tree of Life',
+    type: 'Code',
+    typeIcon: '⌘',
+    rarity: 'rare' as const,
+    corner: '31 SPP',
+    stats: [
+      { label: 'Species', value: '31' },
+      { label: 'Traits', value: '10' },
+      { label: 'Engine', value: 'Canvas' },
+    ],
+    ability: { name: 'Convergence', text: 'Pick a trait; every lineage that evolved it lights up.' },
+    flavor: 'Bats and birds both said “wings” — separately.',
+  },
+  {
+    id: 'rag',
+    name: 'Local RAG',
+    type: 'Code',
+    typeIcon: '⌘',
+    rarity: 'common' as const,
+    corner: 'OFFLINE',
+    stats: [
+      { label: 'UI', value: 'SwiftUI' },
+      { label: 'Model', value: 'Ollama' },
+      { label: 'Wi-Fi', value: 'None' },
+    ],
+    ability: { name: 'Airplane Mode', text: 'Chat with your texts. Nothing ever leaves the device.' },
+    flavor: 'Private repo. Private data. Private everything.',
+  },
+  {
+    id: 'site',
+    name: 'This Website',
+    type: 'Code',
+    typeIcon: '⌘',
+    rarity: 'common' as const,
+    corner: 'LIVE',
+    stats: [
+      { label: 'Framework', value: 'Astro' },
+      { label: 'Islands', value: 'Svelte' },
+      { label: 'Extra', value: 'WebGL' },
+    ],
+    ability: { name: 'Shapeshifter', text: 'Has tried on at least six designs. You’re holding one.' },
+    flavor: 'Deck printed on Cloudflare’s edge.',
+  },
+];
+
+const rookie = {
+  id: 'rookie',
+  name: 'Jason Wride',
+  type: 'Human',
+  typeIcon: '🧑‍💻',
+  rarity: 'rookie' as const,
+  corner: 'RC',
+  stats: [
+    { label: 'Major', value: 'IS' },
+    { label: 'School', value: 'U of U' },
+    { label: 'Camera', value: 'M50' },
+  ],
+  ability: { name: 'Two-Way Player', text: 'Shoots photos and ships code, sometimes on the same day.' },
+  flavor: 'Tilt the card — the portrait looks back.',
+};
+
+const all = [rookie, ...photoDeck, ...codeDeck];
+const cards = all.map((c, i) => ({ ...c, number: `${String(i + 1).padStart(3, '0')}/${String(all.length).padStart(3, '0')}` }));
+---
+
+<Concept title="Trading Cards" current="trading-cards" fonts="family=Bungee&family=Barlow+Condensed:ital,wght@0,500;0,600;0,700;1,500">
+  <main class="shop">
+    <header class="marquee-sign">
+      <p class="est">EST. 2025 · CARDS · CODE · CAMERAS</p>
+      <h1 class="title">
+        <span>Jason</span>
+        <span>Wride</span>
+      </h1>
+      <p class="tagline">
+        Information Systems student at the University of Utah. Photographer. Collectible. <b>Open a pack →</b>
+      </p>
+    </header>
+
+    <section aria-label="Booster pack">
+      <BoosterPack client:visible {cards} {portrait} />
+    </section>
+
+    <footer class="counter-foot">
+      <p>Trades & inquiries</p>
+      <a href="mailto:jason.wride@utah.edu">jason.wride@utah.edu</a>
+      <p class="fine">Not affiliated with any actual card game. No cards were harmed.</p>
+    </footer>
+  </main>
+</Concept>
+
+<style is:global>
+  body {
+    background-color: #1d1447;
+    color: #fff4e0;
+    font-family: 'Barlow Condensed', sans-serif;
+    /* halftone dots + spotlight */
+    background-image:
+      radial-gradient(ellipse at 50% 0%, rgba(255, 90, 60, 0.35), transparent 60%),
+      radial-gradient(rgba(255, 244, 224, 0.07) 1.5px, transparent 1.5px);
+    background-size: 100% 100%, 14px 14px;
+    background-attachment: fixed;
+  }
+  a { color: #f2c14e; }
+</style>
+
+<style>
+  .shop { max-width: 1240px; margin: 0 auto; padding: 2.5rem 1rem 8rem; }
+
+  .marquee-sign { text-align: center; margin-bottom: 2rem; }
+  .est { font-weight: 700; letter-spacing: 0.35em; font-size: 0.8rem; color: #f2c14e; }
+  .title {
+    font-family: 'Bungee', sans-serif;
+    font-weight: 400;
+    font-size: clamp(3.5rem, 12vw, 8rem);
+    line-height: 0.9;
+    margin: 0.6rem 0 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    column-gap: 0.35em;
+    color: #fff4e0;
+    text-shadow: 5px 5px 0 #ff5a3c, 10px 10px 0 #b8216b;
+  }
+  .title span { display: inline-block; transition: transform 0.3s cubic-bezier(0.3, 1.8, 0.5, 1); }
+  .title span:hover { transform: rotate(-4deg) scale(1.06); }
+  .title span:last-child:hover { transform: rotate(4deg) scale(1.06); }
+  .tagline { font-size: 1.25rem; font-weight: 500; max-width: 48ch; margin: 0 auto; opacity: 0.9; }
+  .tagline b { color: #f2c14e; }
+
+  .counter-foot { text-align: center; margin-top: 5rem; font-size: 1.1rem; }
+  .counter-foot a { display: inline-block; font-family: 'Bungee', sans-serif; font-size: clamp(1.4rem, 5vw, 2.6rem); margin: 0.4rem 0 1rem; text-decoration: none; }
+  .counter-foot a:hover { text-shadow: 3px 3px 0 #b8216b; }
+  .fine { font-size: 0.8rem; opacity: 0.55; }
+</style>
