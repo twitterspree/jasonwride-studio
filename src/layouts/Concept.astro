@@ -78,6 +78,20 @@ const concepts = [
       .concept-switcher a:hover { background: #2a2a2a; }
       .concept-switcher a[aria-current='page'] { background: #eee; color: #111; }
       .cs-live { opacity: 0.6; }
+
+      /* Too many concepts for one pill on narrower screens: wrap instead of hiding them offscreen */
+      @media (max-width: 900px) {
+        .concept-switcher {
+          flex-wrap: wrap;
+          justify-content: center;
+          width: max-content;
+          max-width: calc(100vw - 1rem);
+          border-radius: 18px;
+          overflow: visible;
+        }
+        .cs-label { display: none; }
+        .concept-switcher a { padding: 0.45rem 0.7rem; }
+      }
     </style>
   </body>
 </html>
