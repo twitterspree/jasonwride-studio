@@ -9,7 +9,9 @@
     "check": "astro check",
     "deploy": "astro build && wrangler deploy",
     "astro": "astro",
-    "tree": "python3 build_tree.py"
+    "tree": "python3 build_tree.py",
+    "picker": "bun tools/picker/server.ts",
+    "photos:import": "bun tools/picker/import.ts"
   },
   "dependencies": {
     "@astrojs/svelte": "^9.0.1",
@@ -19,6 +21,8 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "@types/bun": "^1.4.2",
+    "exifr": "^7.1.3",
     "repomix": "^1.18.0",
     "typescript": "^5.9.3",
     "wrangler": "^4.141.0"

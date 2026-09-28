@@ -4,8 +4,20 @@
     {
       "name": "astro-dev",
       "runtimeExecutable": "bun",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
       "port": 4321
+    },
+    {
+      "name": "photo-picker",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": [
+        "run",
+        "picker"
+      ],
+      "port": 4400
     }
   ]
 }

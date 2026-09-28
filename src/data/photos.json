@@ -2,36 +2,57 @@
   "IMG_7799": {
     "alt": "Couple portrait among golden autumn leaves, one playfully covering the other’s eyes",
     "date": "2025-10-11",
-    "aperture": 1.4, "shutter": "1/1000", "iso": 6400, "focal": 56
+    "aperture": 1.4,
+    "shutter": "1/1000",
+    "iso": 6400,
+    "focal": 56
   },
   "IMG_8004-2": {
     "alt": "Couple walking hand in hand down a path under bright yellow autumn trees",
     "date": "2025-10-12",
-    "aperture": 1.8, "shutter": "1/1250", "iso": 500, "focal": 56
+    "aperture": 1.8,
+    "shutter": "1/1250",
+    "iso": 500,
+    "focal": 56
   },
   "IMG_8504": {
     "alt": "Smiling couple sitting on a boulder beside a rushing mountain stream",
     "date": "2025-11-14",
-    "aperture": 2, "shutter": "1/800", "iso": 1600, "focal": 56
+    "aperture": 2,
+    "shutter": "1/800",
+    "iso": 1600,
+    "focal": 56
   },
   "IMG_8545-2": {
     "alt": "Couple seen from behind, leaning together on a rock above a mountain stream",
     "date": "2025-11-14",
-    "aperture": 2, "shutter": "1/800", "iso": 2000, "focal": 56
+    "aperture": 2,
+    "shutter": "1/800",
+    "iso": 2000,
+    "focal": 56
   },
   "IMG_8686-2": {
     "alt": "Group of twelve friends standing in a leaf-covered clearing at golden hour",
     "date": "2025-11-15",
-    "aperture": 1.8, "shutter": "1/800", "iso": 125, "focal": 56
+    "aperture": 1.8,
+    "shutter": "1/800",
+    "iso": 125,
+    "focal": 56
   },
   "IMG_8907": {
     "alt": "Two friends posing together in a forest clearing covered in fallen leaves",
     "date": "2025-11-15",
-    "aperture": 2, "shutter": "1/1600", "iso": 640, "focal": 56
+    "aperture": 2,
+    "shutter": "1/1600",
+    "iso": 640,
+    "focal": 56
   },
   "IMG_8934": {
     "alt": "Two friends jumping mid-air in an autumn forest clearing",
     "date": "2025-11-15",
-    "aperture": 1.8, "shutter": "1/2000", "iso": 400, "focal": 56
+    "aperture": 1.8,
+    "shutter": "1/2000",
+    "iso": 400,
+    "focal": 56
   }
 }

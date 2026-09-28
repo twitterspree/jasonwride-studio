@@ -22,6 +22,7 @@ src/
 ├── layouts/Base.astro
 ├── pages/           # index, tree-of-life, 404
 ├── scripts/         # Plain TS modules (particle background)
+tools/picker/        # Local-only photo picker + importer (Bun)
 └── styles/global.css
 public/              # favicon, og-image.jpg
 build_tree.py        # Generates + validates src/data/tree.json
@@ -41,5 +42,16 @@ build_tree.py        # Generates + validates src/data/tree.json
 
 ## Adding content
 
-- **Photos**: drop an image into `src/assets/photos/` and add its alt text (and optionally date and exposure settings) to `src/data/photos.json`, keyed by filename without the extension.
+### Photos (picker workflow)
+
+1. `bun run picker` → open http://localhost:4400. It shows every photo in your source folders
+   (default: `~/Pictures/Lightroom Exports`; add more in `_raw/picker/sources.json`).
+2. Click frames to circle your selects. Tick **OK to feature publicly** on a shoot once the people in it said yes.
+3. `bun run photos:import` copies circled photos from approved shoots into `src/assets/photos/`,
+   resized and with all metadata (including GPS) stripped, and records date + exposure in `src/data/photos.json`.
+4. Add alt text for the new entries in `src/data/photos.json`.
+
+The picker only listens on localhost, and its thumbnails and selections live in `_raw/picker/` (gitignored).
+
+- **Photos (by hand)**: drop an image into `src/assets/photos/` and add its alt text (and optionally date and exposure settings) to `src/data/photos.json`, keyed by filename without the extension.
 - **Tree species / traits**: edit `tree_data` in `build_tree.py`, describe any new trait in `src/data/traits.json`, then run `bun run tree`.
