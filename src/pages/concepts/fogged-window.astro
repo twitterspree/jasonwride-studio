@@ -1,0 +1,132 @@
+---
+import Concept from '../../layouts/Concept.astro';
+import FogWindow from '../../components/concepts/FogWindow.svelte';
+import DraggableSkills from '../../components/DraggableSkills.svelte';
+import { loadLandscapes } from '../../lib/landscapes';
+import { loadPhotos } from '../../lib/photos';
+
+const land = Object.fromEntries((await loadLandscapes()).map((l) => [l.id, l]));
+const people = Object.fromEntries((await loadPhotos(600)).map((p) => [p.id, p]));
+const fmt = (d?: string) =>
+  d ? new Date(d + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : '';
+const cap = (l: { place: string; date: string; exif: string }) => `${l.place} · ${fmt(l.date)} · ${l.exif}`;
+
+// Each pane: a photo behind glass and the word finger-written into its fog
+const panes = [
+  { l: land['IMG_0489-2-hdr'], writing: 'hi, I’m Jason', sub: 'Photographer & developer. Wipe the glass to see what’s outside.' },
+  { l: land['IMG_0591'], writing: 'Santaquin' },
+  { l: land['IMG_2109'], writing: 'Oregon' },
+  { p: people['IMG_8004-2'], writing: 'people too' },
+  { l: land['IMG_2090'], writing: 'salt' },
+  { l: land['IMG_2166'], writing: 'fog' },
+].filter((x) => x.l || x.p);
+---
+
+<Concept title="Fogged Window" current="fogged-window" fonts="family=Caveat:wght@600&family=Instrument+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1">
+  <main class="room">
+    <header class="top">
+      <p class="label">jasonwride.studio</p>
+      <p class="label">cold morning · windows fogged</p>
+    </header>
+
+    <div class="windows">
+      {panes.map((pane, i) => (
+        <FogWindow
+          client:visible
+          src={pane.l ? pane.l.full : pane.p!.full}
+          alt={pane.l ? pane.l.alt : pane.p!.alt}
+          caption={pane.l ? cap(pane.l) : `${fmt(pane.p!.date)} · ${pane.p!.exif ?? ''}`}
+          writing={pane.writing}
+          sub={pane.sub}
+          tall={i === 0}
+        />
+      ))}
+    </div>
+
+    <section class="sill" data-skill-bounds>
+      <h2>On the windowsill</h2>
+      <p class="lede">
+        Information Systems student at the University of Utah. I shoot people in golden light and landscapes in the fog,
+        and I build software in between.
+      </p>
+      <p class="label">Things to fidget with</p>
+      <DraggableSkills client:visible />
+
+      <div class="projects">
+        <article>
+          <h3>Tree of Life</h3>
+          <p>An interactive tree of convergent evolution — pick a trait, watch unrelated lineages light up.</p>
+          <a href="/tree-of-life">Open it →</a>
+        </article>
+        <article>
+          <h3>Local RAG Assistant</h3>
+          <p>A macOS/iOS app that chats with your message history, completely offline.</p>
+          <span class="muted">Private repo</span>
+        </article>
+        <article>
+          <h3>This website</h3>
+          <p>Astro + Svelte. The fog is a canvas you’re erasing, pixel by pixel.</p>
+          <a href="https://github.com/twitterspree/jasonwride-studio">Source →</a>
+        </article>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <p class="fog-note">write me something ↓</p>
+      <a href="mailto:jason.wride@utah.edu">jason.wride@utah.edu</a>
+    </footer>
+  </main>
+</Concept>
+
+<style is:global>
+  :root {
+    --frame: #2b2f33;
+    --bg-base: #1c2126;
+    --text-base: #e7ecf0;
+    --card-bg: #2b3137;
+    --border-subtle: rgba(255, 255, 255, 0.12);
+    --shadow-soft: 0 6px 16px rgba(0, 0, 0, 0.35);
+    --accent-color: #9ec3e6;
+    --accent-glow: rgba(158, 195, 230, 0.3);
+  }
+  body {
+    background: #1c2126;
+    color: #e7ecf0;
+    font-family: 'Instrument Sans', sans-serif;
+    background-image: radial-gradient(ellipse at 50% 0%, #2c343c, transparent 70%);
+  }
+  a { color: #9ec3e6; }
+</style>
+
+<style>
+  .room { max-width: 1200px; margin: 0 auto; padding: 1.5rem clamp(0.75rem, 3vw, 2rem) 8rem; }
+  .top { display: flex; justify-content: space-between; margin-bottom: 1.2rem; }
+  .label { font: 500 0.75rem 'Instrument Sans', sans-serif; letter-spacing: 0.16em; text-transform: uppercase; color: #8e9aa6; }
+
+  .windows { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+  /* Astro islands are display:contents, so the pane itself is the grid item */
+  .windows > :global(astro-island:first-of-type > .pane) { grid-column: 1 / -1; }
+
+  .sill {
+    margin-top: 1.2rem;
+    padding: 2.5rem clamp(1.2rem, 4vw, 3rem);
+    background: linear-gradient(#3a3f45, #2b2f33);
+    border-top: 6px solid #4a5058;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
+  }
+  .sill h2 { font: 400 clamp(2rem, 5vw, 3.4rem) 'Instrument Serif', serif; }
+  .lede { font-size: 1.15rem; line-height: 1.6; max-width: 56ch; margin: 0.6rem 0 1.8rem; color: #c9d2da; }
+  .projects { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-top: 2.5rem; }
+  .projects article { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); padding: 1.2rem; }
+  .projects h3 { font: 400 1.6rem 'Instrument Serif', serif; margin-bottom: 0.4rem; }
+  .projects p { line-height: 1.5; color: #c9d2da; margin-bottom: 0.7rem; }
+  .muted { color: #8e9aa6; }
+
+  .foot { text-align: center; padding: 5rem 1rem 0; }
+  .fog-note { font: 1.8rem 'Caveat', cursive; color: #8e9aa6; }
+  .foot a { font: 400 clamp(1.8rem, 6vw, 3.6rem) 'Instrument Serif', serif; }
+
+  @media (max-width: 760px) {
+    .windows { grid-template-columns: 1fr; }
+  }
+</style>
