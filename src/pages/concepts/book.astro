@@ -1,0 +1,387 @@
+---
+import Concept from '../../layouts/Concept.astro';
+import DepthProfile from '../../components/DepthProfile.svelte';
+import DraggableSkills from '../../components/DraggableSkills.svelte';
+import LoosePrints from '../../components/concepts/LoosePrints.svelte';
+import { loadPhotos, CAMERA, LENS } from '../../lib/photos';
+import { loadPortrait } from '../../lib/portrait';
+
+const photos = await loadPhotos(420);
+const portrait = await loadPortrait();
+const roman = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
+const fmt = (d?: string) =>
+  d ? new Date(d + 'T12:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : '';
+
+const works = [
+  {
+    title: 'The Tree of Life',
+    body: 'A radial cladogram of convergent evolution. Pick a trait — flight, venom, echolocation — and watch unrelated lineages light up where they arrived at the same answer independently.',
+    meta: 'Svelte · Canvas 2D · Python',
+    href: '/tree-of-life',
+    fig: 'Fig. 1 — Thirty-one living groups, one common ancestor.',
+  },
+  {
+    title: 'A Private Librarian',
+    body: 'A native macOS and iOS app that runs a local language model over my own message history, so I can search it by meaning and ask it questions — without a single byte leaving the device.',
+    meta: 'SwiftUI · Ollama · Vector search',
+    fig: 'Private repository.',
+  },
+  {
+    title: 'This Book',
+    body: 'The site you are holding. Astro and Svelte, a WebGL depth map behind the frontispiece, and a physics engine that exists purely so you can throw the prints around.',
+    meta: 'Astro · Svelte · WebGL',
+    href: 'https://github.com/twitterspree/jasonwride-studio',
+    fig: 'Source available.',
+  },
+];
+---
+
+<Concept
+  title="The Book"
+  current="book"
+  fonts="family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..900,0..100,0..1;1,9..144,300..900,0..100,0..1&family=IBM+Plex+Mono:wght@400;500&family=Caveat:wght@500"
+>
+  <div class="book">
+    <!-- COVER -->
+    <header class="cover" data-skill-bounds>
+      <div class="cover-text">
+        <p class="kicker">Vol. I &nbsp;·&nbsp; 2025–26</p>
+        <h1 class="title" aria-label="Jason Wride">
+          {'Jason Wride'.split('').map((ch) => (ch === ' ' ? <br /> : <span class="wobble">{ch}</span>))}
+        </h1>
+        <p class="subtitle">Photographs, code <em>&amp;</em> other experiments by an information systems student at the University of Utah.</p>
+
+        <div class="tools">
+          <p class="tools-label">Tools of the trade <span>(throw them)</span></p>
+          <DraggableSkills client:visible />
+        </div>
+      </div>
+
+      <figure class="frontispiece">
+        <div class="tipped-in">
+          <DepthProfile client:load {...portrait} alt="Portrait of Jason Wride" />
+        </div>
+        <figcaption><em>Frontispiece.</em> The author, looking around. Move your cursor over him.</figcaption>
+        <button class="stamp" type="button" aria-label="First edition stamp">First<br />Edition</button>
+      </figure>
+    </header>
+
+    <!-- CONTENTS -->
+    <nav class="contents" aria-label="Contents">
+      <h2 class="small-caps">Contents</h2>
+      <ol>
+        <li><a href="#plates"><span>Plates</span><i></i><b>{photos.length}</b></a></li>
+        <li><a href="#prints"><span>Loose Prints</span><i></i><b>∞</b></a></li>
+        <li><a href="#works"><span>Works</span><i></i><b>{works.length}</b></a></li>
+        <li><a href="#colophon"><span>Colophon</span><i></i><b>—</b></a></li>
+      </ol>
+    </nav>
+
+    <!-- PLATES -->
+    <section id="plates" class="chapter">
+      <h2 class="chapter-title"><span class="small-caps">Part One</span>Plates</h2>
+      {photos.map((p, i) => (
+        <figure class:list={['plate', p.portrait ? 'plate-portrait' : 'plate-landscape', i % 2 ? 'right' : 'left']}>
+          <img src={p.full} alt={p.alt} loading="lazy" decoding="async" />
+          <figcaption>
+            <span class="plate-no">Pl. {roman[i]}</span>
+            <span class="plate-cap">{p.alt}. {fmt(p.date)}.</span>
+            <span class="plate-exif">{p.exif}</span>
+          </figcaption>
+        </figure>
+      ))}
+    </section>
+
+    <!-- LOOSE PRINTS -->
+    <section id="prints" class="chapter">
+      <h2 class="chapter-title"><span class="small-caps">Part Two</span>Loose Prints</h2>
+      <p class="aside">Found tucked in the back cover. Drag them around; click one to read the back.</p>
+      <LoosePrints client:visible photos={photos} />
+    </section>
+
+    <!-- WORKS -->
+    <section id="works" class="chapter">
+      <h2 class="chapter-title"><span class="small-caps">Part Three</span>Works</h2>
+      {works.map((w, i) => (
+        <article class="work">
+          <p class="work-no">{roman[i]}.</p>
+          <div>
+            <h3>{w.title}</h3>
+            <p class="dropcap">{w.body}</p>
+            <p class="work-meta">{w.meta}</p>
+            <p class="work-fig">
+              {w.fig} {w.href && <a href={w.href}>Turn to it →</a>}
+            </p>
+          </div>
+        </article>
+      ))}
+    </section>
+
+    <!-- COLOPHON -->
+    <footer id="colophon" class="colophon">
+      <h2 class="small-caps">Colophon</h2>
+      <p>
+        Set in Fraunces and IBM Plex Mono. Photographs made with a {CAMERA} and a {LENS}, mostly wide open. Printed on
+        the web, bound in Svelte.
+      </p>
+      <p>Correspondence welcome: <a href="mailto:jason.wride@utah.edu">jason.wride@utah.edu</a></p>
+      <p class="fin">— fin —</p>
+    </footer>
+  </div>
+</Concept>
+
+<script>
+  // Plates settle onto the page as they scroll into view
+  const io = new IntersectionObserver(
+    (entries) => entries.forEach((e) => e.isIntersecting && e.target.classList.add('in')),
+    { threshold: 0.2 }
+  );
+  document.querySelectorAll('.plate').forEach((el) => io.observe(el));
+
+  // The rubber stamp re-stamps itself when clicked
+  const stamp = document.querySelector<HTMLElement>('.stamp');
+  stamp?.addEventListener('click', () => {
+    stamp.classList.remove('thunk');
+    void stamp.offsetWidth;
+    stamp.classList.add('thunk');
+  });
+</script>
+
+<style is:global>
+  :root {
+    --paper: #f3ede2;
+    --ink: #1d1b17;
+    --ink-soft: #5c554a;
+    --red: #d9432b;
+    /* tokens DraggableSkills / DepthProfile read */
+    --bg-base: var(--paper);
+    --text-base: var(--ink);
+    --card-bg: #fbf8f1;
+    --border-subtle: rgba(29, 27, 23, 0.15);
+    --shadow-soft: 0 2px 0 rgba(29, 27, 23, 0.9);
+    --accent-color: var(--red);
+    --accent-glow: rgba(217, 67, 43, 0.25);
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Fraunces', Georgia, serif;
+    font-optical-sizing: auto;
+    font-size: 19px;
+    line-height: 1.55;
+    /* faint paper grain */
+    background-image: radial-gradient(rgba(0, 0, 0, 0.035) 1px, transparent 1px);
+    background-size: 3px 3px;
+  }
+
+  ::selection { background: var(--red); color: var(--paper); }
+  a { color: inherit; text-decoration-color: var(--red); text-underline-offset: 3px; }
+  a:hover { color: var(--red); }
+</style>
+
+<style>
+  .book {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 8rem;
+  }
+
+  .small-caps {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  /* ---------- Cover ---------- */
+  .cover {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    min-height: 88vh;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 3rem;
+  }
+
+  .kicker { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--red); }
+
+  .title {
+    font-size: clamp(4rem, 12vw, 9.5rem);
+    line-height: 0.85;
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    margin: 1rem 0 1.5rem;
+    font-variation-settings: 'SOFT' 0, 'WONK' 0, 'opsz' 144;
+  }
+
+  /* Letters go soft + wonky and hop when you touch them */
+  .wobble {
+    display: inline-block;
+    transition: font-variation-settings 0.5s ease, transform 0.35s cubic-bezier(0.3, 1.8, 0.5, 1), color 0.3s;
+  }
+  .wobble:hover {
+    font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 144;
+    font-style: italic;
+    color: var(--red);
+    transform: translateY(-0.08em) rotate(-4deg);
+  }
+
+  .subtitle {
+    font-size: 1.35rem;
+    font-weight: 350;
+    max-width: 30ch;
+    line-height: 1.4;
+  }
+  .subtitle em { color: var(--red); }
+
+  .tools { margin-top: 2.5rem; }
+  .tools-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 0.8rem;
+  }
+  .tools-label span { font-family: 'Caveat', cursive; font-size: 1.1rem; letter-spacing: 0; text-transform: none; color: var(--red); }
+
+  .frontispiece { position: relative; }
+  .tipped-in {
+    height: 540px;
+    background: #fbf8f1;
+    padding: 14px 14px 14px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2), 0 18px 40px rgba(50, 35, 10, 0.18);
+    transform: rotate(1.2deg);
+  }
+  .tipped-in :global(.depth-container) { border-radius: 0; }
+  .frontispiece figcaption {
+    margin-top: 1.2rem;
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+    text-align: center;
+  }
+
+  .stamp {
+    position: absolute;
+    top: -1.5rem;
+    left: -2rem;
+    width: 118px;
+    height: 118px;
+    border-radius: 50%;
+    border: 3px double var(--red);
+    background: transparent;
+    color: var(--red);
+    font: 600 0.8rem/1.2 'IBM Plex Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    transform: rotate(-14deg);
+    opacity: 0.85;
+    mix-blend-mode: multiply;
+    cursor: pointer;
+    z-index: 2;
+  }
+  .stamp:global(.thunk) { animation: thunk 0.35s ease; }
+  @keyframes thunk {
+    0% { transform: rotate(-14deg) scale(1.5); opacity: 0; }
+    60% { transform: rotate(-10deg) scale(0.92); opacity: 1; }
+    100% { transform: rotate(-14deg) scale(1); }
+  }
+
+  /* ---------- Contents ---------- */
+  .contents { max-width: 560px; margin: 5rem auto; }
+  .contents h2 { text-align: center; margin-bottom: 1.5rem; }
+  .contents ol { list-style: none; }
+  .contents a {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    text-decoration: none;
+    font-size: 1.4rem;
+    padding: 0.35rem 0;
+  }
+  .contents i { flex: 1; border-bottom: 2px dotted currentColor; opacity: 0.35; transform: translateY(-0.3em); }
+  .contents b { font-weight: 400; font-variant-numeric: oldstyle-nums; }
+  .contents a:hover span { font-style: italic; }
+
+  /* ---------- Chapters ---------- */
+  .chapter { padding: 5rem 0; border-top: 1px solid var(--ink); }
+  .chapter-title {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 300;
+    font-style: italic;
+    letter-spacing: -0.02em;
+    margin-bottom: 3rem;
+  }
+  .chapter-title .small-caps { font-style: normal; color: var(--red); }
+  .aside { font-style: italic; color: var(--ink-soft); margin: -2rem 0 1.5rem; }
+
+  /* ---------- Plates ---------- */
+  .plate {
+    margin: 0 0 6rem;
+    opacity: 0;
+    transform: translateY(40px) rotate(0.6deg);
+    transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .plate:global(.in) { opacity: 1; transform: none; }
+  .plate img { width: 100%; height: auto; background: #e6dccb; }
+  .plate-landscape.left { margin-right: 12%; }
+  .plate-landscape.right { margin-left: 12%; }
+  .plate-portrait { width: 55%; }
+  .plate-portrait.right { margin-left: auto; }
+
+  .plate figcaption {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.2rem 1rem;
+    margin-top: 0.9rem;
+    font-size: 0.95rem;
+  }
+  .plate-no { font-weight: 700; font-style: italic; color: var(--red); grid-row: span 2; }
+  .plate-exif { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: var(--ink-soft); letter-spacing: 0.04em; }
+
+  /* ---------- Works ---------- */
+  .work {
+    display: grid;
+    grid-template-columns: 5rem 1fr;
+    gap: 1rem;
+    padding: 2.5rem 0;
+    border-bottom: 1px solid rgba(29, 27, 23, 0.15);
+    max-width: 760px;
+  }
+  .work-no { font-size: 2.5rem; font-style: italic; font-weight: 300; color: var(--red); line-height: 1; }
+  .work h3 { font-size: 2rem; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 0.8rem; }
+  .dropcap::first-letter {
+    float: left;
+    font-size: 3.6em;
+    line-height: 0.8;
+    padding: 0.08em 0.1em 0 0;
+    font-weight: 700;
+    color: var(--red);
+    font-variation-settings: 'SOFT' 100, 'WONK' 1;
+  }
+  .work-meta { margin-top: 1rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; letter-spacing: 0.08em; color: var(--ink-soft); }
+  .work-fig { margin-top: 0.4rem; font-style: italic; font-size: 0.95rem; color: var(--ink-soft); }
+
+  /* ---------- Colophon ---------- */
+  .colophon { max-width: 520px; margin: 4rem auto 0; text-align: center; font-size: 0.95rem; color: var(--ink-soft); }
+  .colophon h2 { margin-bottom: 1rem; }
+  .colophon p + p { margin-top: 0.8rem; }
+  .fin { font-style: italic; margin-top: 2rem !important; color: var(--red); }
+
+  @media (max-width: 860px) {
+    .cover { grid-template-columns: 1fr; gap: 3rem; }
+    .frontispiece { order: -1; max-width: 420px; margin: 0 auto; width: 100%; }
+    .tipped-in { height: 420px; }
+    .stamp { left: -0.5rem; width: 92px; height: 92px; font-size: 0.65rem; }
+    .plate-landscape.left, .plate-landscape.right { margin-left: 0; margin-right: 0; }
+    .plate-portrait { width: 80%; }
+    .work { grid-template-columns: 3rem 1fr; }
+  }
+</style>

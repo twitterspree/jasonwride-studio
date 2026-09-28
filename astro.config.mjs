@@ -1,12 +1,13 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
-
 import svelte from '@astrojs/svelte';
 
-import cloudflare from '@astrojs/cloudflare';
-
 // https://astro.build/config
+// Fully static site — Cloudflare serves ./dist as static assets (see wrangler.jsonc).
 export default defineConfig({
+  site: 'https://jasonwride.studio',
   integrations: [svelte()],
-  adapter: cloudflare()
+  redirects: {
+    '/concepts': '/concepts/book',
+  },
 });

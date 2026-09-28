@@ -1,0 +1,87 @@
+{
+  "bioluminescence": {
+    "title": "Bioluminescence",
+    "description": "The biochemical emission of light by living organisms. It has evolved independently dozens of times — recent estimates put it at more than 90 separate origins across bacteria, fungi, and animals.",
+    "showdown": [
+      { "species": "Fireflies", "detail": "Oxidise luciferin in a specialised lantern organ, flashing species-specific codes to attract mates." },
+      { "species": "Ghost Fungus", "detail": "Emits a continuous green glow, likely to attract insects that help disperse its spores." },
+      { "species": "Anglerfish", "detail": "Doesn't make its own light at all — its lure is packed with symbiotic glowing bacteria." }
+    ]
+  },
+  "camera_eye": {
+    "title": "The Camera Eye",
+    "description": "A hollow eye with a lens that focuses light onto a retina. This complex structure evolved completely independently in vertebrates and cephalopods.",
+    "showdown": [
+      { "species": "Humans", "detail": "Our retinal wiring sits in front of the light receptors, creating a blind spot where the optic nerve exits." },
+      { "species": "Octopuses", "detail": "Their wiring sits behind the receptors. Same camera design, but with no blind spot." }
+    ]
+  },
+  "echolocation": {
+    "title": "Echolocation",
+    "description": "Navigating and hunting by emitting sound and listening for echoes. Bats and toothed whales arrived at it separately — and even share convergent changes in the same hearing gene, prestin.",
+    "showdown": [
+      { "species": "Bats", "detail": "Produce ultrasonic calls in the larynx and catch echoes with large, mobile ears." },
+      { "species": "Dolphins", "detail": "Generate clicks in their nasal passages, focus them through the fatty 'melon', and hear echoes through the lower jaw." }
+    ]
+  },
+  "electroreception": {
+    "title": "Electroreception",
+    "description": "Sensing the faint electric fields produced by other animals' muscles and nerves. It has been lost and re-invented several times among vertebrates.",
+    "showdown": [
+      { "species": "Sharks", "detail": "Jelly-filled pores called ampullae of Lorenzini let them find prey buried in sand." },
+      { "species": "Platypus", "detail": "Tens of thousands of receptors in its bill let it hunt underwater with its eyes, ears and nostrils shut." },
+      { "species": "Electric Eels", "detail": "Go a step further: they sense fields and generate discharges of several hundred volts." }
+    ]
+  },
+  "eusociality": {
+    "title": "Eusociality",
+    "description": "Societies with a reproductive caste, sterile workers, and overlapping generations. It evolved separately in ants, in bees, in termites — and even in naked mole-rats.",
+    "showdown": [
+      { "species": "Honeybees", "detail": "Colonies of tens of thousands coordinate foraging through the 'waggle dance'." },
+      { "species": "Ants", "detail": "Some species maintain fungus farms, herd aphids, and build living bridges from their own bodies." }
+    ]
+  },
+  "flight": {
+    "title": "Powered Flight",
+    "description": "Flapping flight evolved at least four separate times: in insects, pterosaurs, birds, and bats — each building a wing from different parts.",
+    "showdown": [
+      { "species": "Bats", "detail": "Stretch a thin membrane across hugely elongated finger bones." },
+      { "species": "Falcons", "detail": "Use feathers anchored to fused hand bones; a stooping peregrine exceeds 300 km/h." },
+      { "species": "Flies", "detail": "Insect wings aren't modified limbs at all, but outgrowths of the exoskeleton." }
+    ]
+  },
+  "photosynthesis": {
+    "title": "Photosynthesis",
+    "description": "A trick question! Plants didn't evolve photosynthesis on their own — their chloroplasts descend from cyanobacteria that an ancestor engulfed. Shared machinery, borrowed rather than convergent.",
+    "showdown": [
+      { "species": "Cyanobacteria", "detail": "Invented oxygen-producing photosynthesis and oxygenated Earth's atmosphere." },
+      { "species": "Flowering Plants", "detail": "Run the same reactions inside chloroplasts, which still carry their own bacterial DNA." }
+    ]
+  },
+  "silk_production": {
+    "title": "Silk Production",
+    "description": "Protein fibres spun from liquid into solid thread. Spiders and many insects make silk using entirely unrelated glands.",
+    "showdown": [
+      { "species": "Spiders", "detail": "Spin from abdominal spinnerets and can produce up to seven kinds of silk for different jobs." },
+      { "species": "Silkworms (not shown)", "detail": "Moth larvae spin cocoon silk from modified salivary glands near the mouth." }
+    ]
+  },
+  "tool_use": {
+    "title": "Tool Use",
+    "description": "Using external objects to achieve a goal. Once thought uniquely human, it has turned up in primates, birds, marine mammals and even molluscs.",
+    "showdown": [
+      { "species": "Crows", "detail": "New Caledonian crows craft hooked tools from twigs to fish grubs out of wood." },
+      { "species": "Octopuses", "detail": "Veined octopuses carry coconut shell halves to assemble into a shelter later." },
+      { "species": "Dolphins", "detail": "Some wear marine sponges on their snouts to protect them while foraging on the seafloor." }
+    ]
+  },
+  "venom": {
+    "title": "Venom",
+    "description": "Toxins delivered through a wound. Venom has evolved independently more than 100 times across the animal kingdom.",
+    "showdown": [
+      { "species": "Cone Snails", "detail": "Fire a harpoon-like modified tooth loaded with fast-acting neurotoxins." },
+      { "species": "Platypus", "detail": "Males carry venomous spurs on their hind legs — one of very few venomous mammals." },
+      { "species": "Vipers", "detail": "Deliver venom through long, hinged fangs that fold away when the mouth closes." }
+    ]
+  }
+}

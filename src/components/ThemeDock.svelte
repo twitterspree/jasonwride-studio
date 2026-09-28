@@ -1,150 +1,118 @@
 <script>
   import { onMount } from 'svelte';
 
-  const themes = [
-    {
-      id: 'cookie',
-      name: 'Warm Studio',
-      bg: '#FFF8F0',
-      text: '#332D2D',
-      card: '#FFFFFF',
-      accent: '#FF9248',
-      glass: 'rgba(255, 255, 255, 0.45)',
-      border: 'rgba(255, 146, 72, 0.2)'
-    },
-    {
-      id: 'lab',
-      name: 'Deep Obsidian',
-      bg: '#0A0D14',
-      text: '#F0F3F8',
-      card: '#121722',
-      accent: '#5FBFF9',
-      glass: 'rgba(18, 23, 34, 0.4)',  /* Lower opacity allows particle refraction */
-      border: 'rgba(95, 191, 249, 0.2)'
-    },
-    {
-      id: 'editorial',
-      name: 'Architectural Paper',
-      bg: '#F5F5F0',
-      text: '#1C1C1A',
-      card: '#FCFCF9',
-      accent: '#E65C00',
-      glass: 'rgba(245, 245, 240, 0.45)',
-      border: 'rgba(28, 28, 26, 0.15)'
-    },
-    {
-      id: 'forest',
-      name: 'Nordic Moss',
-      bg: '#0E1614',
-      text: '#E2EBE6',
-      card: '#162320',
-      accent: '#48D597',
-      glass: 'rgba(22, 35, 32, 0.4)',
-      border: 'rgba(72, 213, 151, 0.2)'
-    }
+  // Token values live in global.css under [data-theme]; these are just for the picker UI.
+  // Keep ids in sync with the boot script in Base.astro.
+  const THEMES = [
+    { id: 'cookie', name: 'Warm Studio', bg: '#FFF8F0', text: '#332D2D', accent: '#FF9248' },
+    { id: 'lab', name: 'Deep Obsidian', bg: '#0A0D14', text: '#F0F3F8', accent: '#5FBFF9' },
+    { id: 'editorial', name: 'Architectural Paper', bg: '#F5F5F0', text: '#1C1C1A', accent: '#E65C00' },
+    { id: 'forest', name: 'Nordic Moss', bg: '#0E1614', text: '#E2EBE6', accent: '#48D597' }
   ];
 
-  let currentThemeId = 'cookie';
-  let customAccent = '#FF9248';
-  let isOpen = false;
+  let currentThemeId = $state('cookie');
+  let customAccent = $state(null);
+  let isOpen = $state(false);
+  let dock;
 
-  function applyTheme(theme, save = true) {
-    currentThemeId = theme.id;
-    customAccent = theme.accent;
+  const currentTheme = $derived(THEMES.find((t) => t.id === currentThemeId) ?? THEMES[0]);
+  const accent = $derived(customAccent ?? currentTheme.accent);
 
-    const root = document.documentElement;
-    root.style.setProperty('--bg-base', theme.bg);
-    root.style.setProperty('--text-base', theme.text);
-    root.style.setProperty('--card-bg', theme.card);
-    root.style.setProperty('--accent-color', theme.accent);
-    root.style.setProperty('--glass-surface', theme.glass);
-    root.style.setProperty('--glass-border', theme.border);
-    
-    // Explicitly sync <body> in case of layer detachment
-    if (document.body) {
-      document.body.style.backgroundColor = theme.bg;
-      document.body.style.color = theme.text;
-    }
-
-    dispatchAccent(theme.accent);
-
-    if (save) {
-      localStorage.setItem('jw-palette', JSON.stringify({ id: theme.id, accent: theme.accent }));
-    }
+  // Pick dark or light text for buttons sitting on the accent colour
+  function onAccentFor(hex) {
+    const [r, g, b] = [1, 3, 5].map((i) => {
+      const c = parseInt(hex.slice(i, i + 2), 16) / 255;
+      return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+    });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b > 0.4 ? '#1C1C1A' : '#FFFFFF';
   }
 
-  function dispatchAccent(color) {
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('accent-color-change', { detail: { color } }));
-    }
+  function save() {
+    try {
+      localStorage.setItem('jw-palette', JSON.stringify({ id: currentThemeId, customAccent }));
+    } catch {}
+  }
+
+  function applyTheme(id) {
+    currentThemeId = id;
+    customAccent = null;
+    const root = document.documentElement;
+    root.dataset.theme = id;
+    root.style.removeProperty('--accent-color');
+    root.style.removeProperty('--on-accent');
+    save();
   }
 
   function handleAccentChange(e) {
-    customAccent = e.target.value;
-    document.documentElement.style.setProperty('--accent-color', customAccent);
-    dispatchAccent(customAccent);
-    localStorage.setItem('jw-palette', JSON.stringify({ id: currentThemeId, accent: customAccent }));
+    customAccent = e.currentTarget.value;
+    const root = document.documentElement;
+    root.style.setProperty('--accent-color', customAccent);
+    root.style.setProperty('--on-accent', onAccentFor(customAccent));
+    save();
+  }
+
+  function handleKeydown(e) {
+    if (e.key === 'Escape' && isOpen) isOpen = false;
+  }
+
+  function handlePointerDown(e) {
+    if (isOpen && dock && !dock.contains(e.target)) isOpen = false;
   }
 
   onMount(() => {
-    const saved = localStorage.getItem('jw-palette');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        const match = themes.find(t => t.id === parsed.id) || themes[0];
-        const loaded = { ...match, accent: parsed.accent || match.accent };
-        applyTheme(loaded, false);
-      } catch (err) {
-        applyTheme(themes[0], false);
-      }
-    } else {
-      applyTheme(themes[0], false);
-    }
+    // The boot script in Base.astro has already applied the saved palette; just mirror it.
+    const root = document.documentElement;
+    currentThemeId = root.dataset.theme || 'cookie';
+    try {
+      const saved = JSON.parse(localStorage.getItem('jw-palette') || 'null');
+      if (saved?.customAccent) customAccent = saved.customAccent;
+    } catch {}
   });
 </script>
 
-<div class="liquid-dock {isOpen ? 'open' : ''}">
-  <button 
-    class="liquid-pill toggle-trigger" 
-    on:click={() => (isOpen = !isOpen)}
-    aria-label="Customize Palette"
-  >
-    <div class="swatch-ring" style="border-color: {customAccent};">
-      <div class="swatch-fill" style="background: {customAccent};"></div>
-    </div>
-    <span class="pill-label">Theme Lab</span>
-  </button>
+<svelte:window onkeydown={handleKeydown} onpointerdown={handlePointerDown} />
 
+<div class="liquid-dock" bind:this={dock}>
   {#if isOpen}
-    <div class="liquid-drawer">
+    <div class="liquid-drawer" id="theme-drawer" role="dialog" aria-label="Palette settings">
       <div class="drawer-header">
         <span class="drawer-title">Palette System</span>
         <label class="custom-color-field" title="Pick precise accent hex">
-          <input 
-            type="color" 
-            value={customAccent} 
-            on:input={handleAccentChange} 
-          />
-          <span class="hex-readout">{customAccent.toUpperCase()}</span>
+          <input type="color" value={accent} oninput={handleAccentChange} aria-label="Custom accent colour" />
+          <span class="hex-readout">{accent.toUpperCase()}</span>
         </label>
       </div>
 
       <div class="theme-grid">
-        {#each themes as t}
-          <button 
-            class="preset-card {currentThemeId === t.id ? 'active' : ''}" 
-            on:click={() => applyTheme(t)}
+        {#each THEMES as t (t.id)}
+          <button
+            class="preset-card"
+            class:active={currentThemeId === t.id}
+            aria-pressed={currentThemeId === t.id}
+            onclick={() => applyTheme(t.id)}
           >
-            <div class="preset-preview" style="background: {t.bg};">
-              <span class="dot-accent" style="background: {t.accent};"></span>
-              <span class="dot-text" style="background: {t.text};"></span>
-            </div>
+            <span class="preset-preview" style:background={t.bg}>
+              <span class="dot-accent" style:background={t.accent}></span>
+              <span class="dot-text" style:background={t.text}></span>
+            </span>
             <span class="preset-name">{t.name}</span>
           </button>
         {/each}
       </div>
     </div>
   {/if}
+
+  <button
+    class="liquid-pill toggle-trigger"
+    onclick={() => (isOpen = !isOpen)}
+    aria-expanded={isOpen}
+    aria-controls="theme-drawer"
+  >
+    <span class="swatch-ring" style:border-color={accent}>
+      <span class="swatch-fill" style:background={accent}></span>
+    </span>
+    <span class="pill-label">Theme Lab</span>
+  </button>
 </div>
 
 <style>
@@ -175,6 +143,7 @@
   }
 
   .toggle-trigger {
+    font: inherit;
     display: flex;
     align-items: center;
     gap: 0.6rem;
@@ -289,6 +258,8 @@
   }
 
   .preset-card {
+    font: inherit;
+    color: inherit;
     background: rgba(125, 125, 125, 0.08);
     border: 1px solid rgba(125, 125, 125, 0.12);
     border-radius: 12px;
