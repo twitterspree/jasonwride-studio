@@ -28,15 +28,14 @@
 
 <div class="marquee-container">
     <div class="marquee-track" class:paused={selected}>
-        <!-- The track is rendered twice for a seamless loop; only the first copy is exposed -->
+        <!-- The track is rendered twice for a seamless loop; the duplicate is inert, so only the first copy is focusable or announced -->
         {#each [0, 1] as copy}
-            <ul class="marquee-set" aria-hidden={copy === 1 ? 'true' : undefined}>
+            <ul class="marquee-set" aria-hidden={copy === 1 ? 'true' : undefined} inert={copy === 1}>
                 {#each images as img (img.id)}
                     <li>
                         <button
                             class="img-btn"
                             onclick={(e) => open(img, e)}
-                            tabindex={copy === 1 ? -1 : undefined}
                             aria-label="View larger: {img.alt}"
                         >
                             <img

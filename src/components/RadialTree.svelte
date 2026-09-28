@@ -57,8 +57,17 @@
     return node.angle;
   }
 
+  // Every trait found at or below a node, so selecting a trait lights the
+  // whole root-to-species path, not just the nodes that carry it
+  function collectLineageTraits(node) {
+    node.lineageTraits = new Set(node.traits);
+    for (const child of node.children) collectLineageTraits(child).forEach((t) => node.lineageTraits.add(t));
+    return node.lineageTraits;
+  }
+
   const root = parse(treeData);
   assignAngles(root);
+  collectLineageTraits(root);
   const availableTraits = [...traitSet].sort();
   const leaves = nodes.filter((n) => n.isLeaf);
 
@@ -82,7 +91,7 @@
   }
 
   function isHighlighted(node) {
-    if (selectedTrait) return node.traits.includes(selectedTrait);
+    if (selectedTrait) return node.lineageTraits.has(selectedTrait);
     if (focusNode) return isOnFocusPath(node);
     return false;
   }
@@ -143,7 +152,7 @@
     // Branches: arc along the parent's orbit, then a radial spoke out to the child
     for (const { source, target } of links) {
       const active = selectedTrait
-        ? target.traits.includes(selectedTrait)
+        ? target.lineageTraits.has(selectedTrait)
         : focusNode && isOnFocusPath(target) && isOnFocusPath(source);
 
       ctx.beginPath();

@@ -41,5 +41,5 @@ build_tree.py        # Generates + validates src/data/tree.json
 
 ## Adding content
 
-- **Photos**: drop an image into `src/assets/photos/` and add an alt description to `photoAlts` in `src/pages/index.astro`.
+- **Photos**: drop an image into `src/assets/photos/` and add its alt text (and optionally date and exposure settings) to `src/data/photos.json`, keyed by filename without the extension.
 - **Tree species / traits**: edit `tree_data` in `build_tree.py`, describe any new trait in `src/data/traits.json`, then run `bun run tree`.
