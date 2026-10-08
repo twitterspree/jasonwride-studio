@@ -1,0 +1,42 @@
+---
+import Concept from '../../layouts/Concept.astro';
+import Almanac from '../../components/concepts/Almanac.svelte';
+import { loadPhotos } from '../../lib/photos';
+import { loadLandscapes } from '../../lib/landscapes';
+import stats from '../../data/exposure-stats.json';
+
+const people = (await loadPhotos(700)).map((p) => ({
+  id: p.id,
+  src: p.full,
+  alt: p.alt,
+  place: '',
+  light: 'golden',
+  date: p.date ?? '',
+  exif: p.exif ?? '',
+  kind: 'people' as const,
+}));
+const lands = (await loadLandscapes())
+  .filter((l) => l.id !== 'IMG_0489-2-hdr')
+  .map((l) => ({ id: l.id, src: l.full, alt: l.alt, place: l.place, light: l.light, date: l.date, exif: l.exif, kind: 'land' as const }));
+
+const P = stats.people;
+const pct = (n: number) => Math.round((n / P.photos) * 100);
+const summary = {
+  photos: P.photos,
+  saturdayPct: pct(P.weekdays['6'] ?? 0),
+  lateAfternoonPct: pct((P.hours['16'] ?? 0) + (P.hours['17'] ?? 0) + (P.hours['18'] ?? 0)),
+  medianAperture: P.medianAperture,
+};
+---
+
+<Concept title="The Almanac" current="almanac" dock="top" fonts="family=UnifrakturMaguntia&family=Old+Standard+TT:ital,wght@0,400;0,700;1,400">
+  <Almanac client:load pics={[...lands, ...people]} stats={summary} />
+</Concept>
+
+<style is:global>
+  body {
+    background: #3b3a36;
+    background-image: radial-gradient(ellipse at 50% 0%, #57554e, #2a2926 75%);
+    min-height: 100dvh;
+  }
+</style>

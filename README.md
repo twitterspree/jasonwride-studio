@@ -38,6 +38,9 @@ build_tree.py        # Generates + validates src/data/tree.json
 | `bun run preview`  | Preview the build locally                               |
 | `bun run check`    | Type-check `.astro`, `.svelte` and `.ts` files          |
 | `bun run tree`     | Regenerate `tree.json` and validate it against traits   |
+| `bun run picker`   | Local photo picker at localhost:4400                    |
+| `bun run photos:import` | Import circled photos from approved shoots         |
+| `bun run stats`    | Recompute aggregate camera stats (totals only)          |
 | `bun run deploy`   | Build and deploy to Cloudflare with Wrangler            |
 
 ## Adding content

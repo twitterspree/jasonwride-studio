@@ -1,0 +1,30 @@
+---
+import Concept from '../../layouts/Concept.astro';
+import Building from '../../components/concepts/Building.svelte';
+import { loadPhotos } from '../../lib/photos';
+import { loadLandscapes } from '../../lib/landscapes';
+import { loadPortrait } from '../../lib/portrait';
+import { CONCEPTS } from '../../data/concepts';
+
+const fmt = (d?: string) =>
+  d ? new Date(d + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : '';
+const portrait = await loadPortrait();
+const photos = (await loadPhotos(800)).map((p) => ({ id: p.id, src: p.full, alt: p.alt, caption: `${fmt(p.date)} · ${p.exif ?? ''}` }));
+const landscapes = (await loadLandscapes())
+  .filter((l) => l.id !== 'IMG_0489-2-hdr')
+  .map((l) => ({ id: l.id, src: l.full, alt: l.alt, caption: `${l.place} · ${fmt(l.date)}` }));
+const concepts = CONCEPTS.filter((c) => c.id !== 'building').map(({ id, label, thesis }) => ({ id, label, thesis }));
+---
+
+<Concept title="The Building" current="building" dock="top" fonts="family=Josefin+Sans:wght@400;600;700">
+  <Building client:load {photos} {landscapes} portrait={portrait.src} {concepts} />
+</Concept>
+
+<style is:global>
+  body {
+    min-height: 100dvh;
+    background:
+      repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.025) 0 2px, transparent 2px 60px),
+      linear-gradient(#2b2520, #15120f);
+  }
+</style>

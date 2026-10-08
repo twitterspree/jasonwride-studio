@@ -11,7 +11,8 @@
     "astro": "astro",
     "tree": "python3 build_tree.py",
     "picker": "bun tools/picker/server.ts",
-    "photos:import": "bun tools/picker/import.ts"
+    "photos:import": "bun tools/picker/import.ts",
+    "stats": "bun tools/stats/exposure.ts"
   },
   "dependencies": {
     "@astrojs/svelte": "^9.0.1",

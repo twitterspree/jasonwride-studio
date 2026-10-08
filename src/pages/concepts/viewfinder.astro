@@ -1,0 +1,79 @@
+---
+import Concept from '../../layouts/Concept.astro';
+import Viewfinder from '../../components/concepts/Viewfinder.svelte';
+import { loadPhotos } from '../../lib/photos';
+import { loadLandscapes } from '../../lib/landscapes';
+import { loadPortrait } from '../../lib/portrait';
+import photoMeta from '../../data/photos.json';
+import landMeta from '../../data/landscapes.json';
+
+type M = { aperture?: number; shutter?: string; iso?: number; focal?: number; date?: string; place?: string };
+const exifOf = (m?: M) =>
+  m && m.aperture && m.shutter && m.iso ? { f: m.aperture, shutter: m.shutter, iso: m.iso, focal: m.focal ?? 0 } : null;
+const fmt = (d?: string) =>
+  d ? new Date(d + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : '';
+
+const portrait = await loadPortrait();
+const backdrop = (await loadLandscapes()).find((l) => l.id === 'IMG_0489-2-hdr')!;
+const portraits = (await loadPhotos(800)).map((p) => {
+  const m = (photoMeta as Record<string, M>)[p.id];
+  return { id: p.id, kind: 'photo' as const, src: p.full, alt: p.alt, caption: `${p.alt} · ${fmt(m?.date)}`, exif: exifOf(m) };
+});
+const landscapes = (await loadLandscapes())
+  .filter((l) => l.id !== 'IMG_0489-2-hdr')
+  .map((l) => {
+    const m = (landMeta as Record<string, M>)[l.id];
+    return { id: l.id, kind: 'photo' as const, src: l.full, alt: l.alt, caption: `${l.alt} · ${l.place}, ${fmt(l.date)}`, exif: exifOf(m) };
+  });
+
+const projects = [
+  {
+    id: 'tree',
+    title: 'Tree of Life',
+    text: 'An interactive radial tree of convergent evolution. Pick a trait — flight, venom, echolocation — and every lineage that evolved it lights up.',
+    stack: 'Svelte · Canvas 2D · Python',
+    href: '/tree-of-life',
+    art: '🌳',
+    tint: '#1f6a3c',
+  },
+  {
+    id: 'rag',
+    title: 'Local RAG Assistant',
+    text: 'A native macOS/iOS app that runs a local language model over your iMessage history so you can search and chat with it — fully offline.',
+    stack: 'SwiftUI · Ollama · Vector DB',
+    art: '💬',
+    tint: '#2b5bd7',
+  },
+  {
+    id: 'site',
+    title: 'This camera',
+    text: 'The viewfinder you’re looking through: a WebGL depth-of-field shader on a depth map, a live histogram, and a spot meter that reads the actual pixels under your cursor.',
+    stack: 'Astro · Svelte · WebGL',
+    href: 'https://github.com/twitterspree/jasonwride-studio',
+    art: '📷',
+    tint: '#b8431f',
+  },
+];
+---
+
+<Concept title="Viewfinder" current="viewfinder" dock="top" fonts="family=Chakra+Petch:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500">
+  <header class="brand">
+    <p><b>jasonwride</b>.studio <span>— the site is a camera</span></p>
+  </header>
+  <Viewfinder client:load portrait={{ src: portrait.src, depthSrc: portrait.depthSrc, bgSrc: backdrop.full, alt: 'Portrait of Jason Wride' }} {portraits} {landscapes} {projects} />
+</Concept>
+
+<style is:global>
+  body {
+    background: radial-gradient(ellipse at 50% -20%, #2b2b2f, #0d0d0e 70%);
+    min-height: 100dvh;
+    color: #e9e7e3;
+  }
+</style>
+
+<style>
+  .brand { position: absolute; top: 0.95rem; right: 1.4rem; font: 0.85rem 'Chakra Petch', sans-serif; color: #bbb; }
+  .brand b { color: #fff; }
+  .brand span { opacity: 0.6; }
+  @media (max-width: 600px) { .brand span { display: none; } }
+</style>

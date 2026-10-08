@@ -1,22 +1,19 @@
 ---
+import { CONCEPTS } from '../data/concepts';
+
 interface Props {
   title: string;
   /** Google Fonts css2 query, e.g. "family=Fraunces:opsz,wght@9..144,300..900" */
   fonts: string;
-  current: 'book' | 'contact-sheet' | 'swiss' | 'field-notes' | 'trading-cards' | 'trailhead' | 'golden-hour' | 'fogged-window';
+  current: string;
+  /** Where the concept switcher pill sits, so it doesn't cover a page's own controls */
+  dock?: 'bottom' | 'top';
 }
-const { title, fonts, current } = Astro.props;
+const { title, fonts, current, dock = 'bottom' } = Astro.props;
 
-const concepts = [
-  { id: 'book', label: 'The Book' },
-  { id: 'contact-sheet', label: 'Contact Sheet' },
-  { id: 'swiss', label: 'Swiss Index' },
-  { id: 'field-notes', label: 'Field Notes' },
-  { id: 'trading-cards', label: 'Trading Cards' },
-  { id: 'trailhead', label: 'Trailhead' },
-  { id: 'golden-hour', label: 'Golden Hour' },
-  { id: 'fogged-window', label: 'Fogged Window' },
-] as const;
+const i = CONCEPTS.findIndex((c) => c.id === current);
+const prev = CONCEPTS[(i - 1 + CONCEPTS.length) % CONCEPTS.length];
+const next = CONCEPTS[(i + 1) % CONCEPTS.length];
 ---
 
 <!doctype html>
@@ -34,12 +31,12 @@ const concepts = [
   <body>
     <slot />
 
-    <nav class="concept-switcher" aria-label="Design concepts">
-      <span class="cs-label">Concept</span>
-      {concepts.map((c) => (
-        <a href={`/concepts/${c.id}`} aria-current={c.id === current ? 'page' : undefined}>{c.label}</a>
-      ))}
-      <a href="/" class="cs-live">Live site ↗</a>
+    <nav class={`concept-switcher dock-${dock}`} aria-label="Design concepts">
+      <a href={`/concepts/${prev.id}`} class="cs-arrow" aria-label={`Previous concept: ${prev.label}`}>‹</a>
+      <a href="/concepts/" class="cs-current" title="All concepts">
+        <span class="cs-num">{i + 1}/{CONCEPTS.length}</span> {CONCEPTS[i]?.label ?? title}
+      </a>
+      <a href={`/concepts/${next.id}`} class="cs-arrow" aria-label={`Next concept: ${next.label}`}>›</a>
     </nav>
 
     <style is:global>
@@ -53,47 +50,31 @@ const concepts = [
     <style>
       .concept-switcher {
         position: fixed;
-        left: 50%;
-        bottom: 1rem;
-        transform: translateX(-50%);
+        left: 0.75rem;
         z-index: 9000;
         display: flex;
         align-items: center;
-        gap: 0.25rem;
-        padding: 0.3rem;
+        gap: 0.1rem;
+        padding: 0.25rem;
         border-radius: 999px;
-        background: #111;
+        background: rgba(17, 17, 17, 0.88);
+        backdrop-filter: blur(8px);
         color: #eee;
         font: 500 12px/1 ui-monospace, 'SF Mono', Menlo, monospace;
         box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
-        max-width: calc(100vw - 1rem);
-        overflow-x: auto;
       }
-      .cs-label { padding: 0 0.6rem; opacity: 0.5; text-transform: uppercase; letter-spacing: 0.1em; }
+      .dock-bottom { bottom: 0.75rem; }
+      .dock-top { top: 0.75rem; }
       .concept-switcher a {
         color: inherit;
         text-decoration: none;
-        padding: 0.5rem 0.8rem;
+        padding: 0.45rem 0.7rem;
         border-radius: 999px;
         white-space: nowrap;
       }
       .concept-switcher a:hover { background: #2a2a2a; }
-      .concept-switcher a[aria-current='page'] { background: #eee; color: #111; }
-      .cs-live { opacity: 0.6; }
-
-      /* Too many concepts for one pill on narrower screens: wrap instead of hiding them offscreen */
-      @media (max-width: 900px) {
-        .concept-switcher {
-          flex-wrap: wrap;
-          justify-content: center;
-          width: max-content;
-          max-width: calc(100vw - 1rem);
-          border-radius: 18px;
-          overflow: visible;
-        }
-        .cs-label { display: none; }
-        .concept-switcher a { padding: 0.45rem 0.7rem; }
-      }
+      .cs-arrow { font-size: 15px; padding: 0.35rem 0.6rem !important; }
+      .cs-num { opacity: 0.55; margin-right: 0.3rem; }
     </style>
   </body>
 </html>

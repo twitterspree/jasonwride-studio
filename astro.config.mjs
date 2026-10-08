@@ -7,7 +7,4 @@ import svelte from '@astrojs/svelte';
 export default defineConfig({
   site: 'https://jasonwride.studio',
   integrations: [svelte()],
-  redirects: {
-    '/concepts': '/concepts/book',
-  },
 });

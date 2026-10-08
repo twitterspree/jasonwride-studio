@@ -1,0 +1,25 @@
+---
+import Concept from '../../layouts/Concept.astro';
+import NumbersStory from '../../components/concepts/NumbersStory.svelte';
+import { loadPhotos } from '../../lib/photos';
+import { loadLandscapes } from '../../lib/landscapes';
+import { loadPortrait } from '../../lib/portrait';
+import stats from '../../data/exposure-stats.json';
+
+const portrait = await loadPortrait();
+const photos = await loadPhotos(400);
+const land = (await loadLandscapes()).find((l) => l.id === 'IMG_2166')!;
+const images = {
+  portrait: portrait.src,
+  cover: photos.filter((p) => ['IMG_7799', 'IMG_8934', 'IMG_8504', 'IMG_8004-2'].includes(p.id)).map((p) => p.thumb),
+  landscape: land.full,
+};
+---
+
+<Concept title="By the Numbers" current="by-the-numbers" dock="top" fonts="family=Bricolage+Grotesque:opsz,wght@12..96,400..800">
+  <NumbersStory client:load {stats} {images} />
+</Concept>
+
+<style is:global>
+  body { background: #0b0b0b; min-height: 100dvh; color: #f4efe6; }
+</style>
